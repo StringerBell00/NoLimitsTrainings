@@ -3,6 +3,7 @@ import {
   View, Text, StyleSheet, ScrollView,
   TouchableOpacity, TextInput, Alert
 } from 'react-native';
+import { useRouter } from 'expo-router';
 
 const OBJECTIFS = [
   { id: 'perte_poids', label: 'Perte de poids' },
@@ -18,7 +19,10 @@ const NIVEAUX = [
   { id: 'avance', label: 'Avance' },
 ];
 
+const MENU = ['Mes programmes', 'Historique des seances', 'Notifications', 'Parametres', 'Deconnexion'];
+
 export default function Profile() {
+  const router = useRouter();
   const [mode, setMode] = useState('view');
   const [nom, setNom] = useState('Sidib');
   const [email, setEmail] = useState('mohamedsidibenoisy7@gmail.com');
@@ -35,6 +39,11 @@ export default function Profile() {
 
   const annuler = () => {
     setMode('view');
+  };
+
+  const handleMenu = (item) => {
+    if (item === 'Notifications') router.push('/notifications');
+    if (item === 'Deconnexion') router.replace('/login');
   };
 
   if (mode === 'edit') {
@@ -153,7 +162,6 @@ export default function Profile() {
     <ScrollView style={styles.container}>
       <Text style={styles.brand}>NLT</Text>
 
-      {/* Avatar */}
       <View style={styles.avatarSection}>
         <View style={styles.avatar}>
           <Text style={styles.avatarText}>{nom[0]}</Text>
@@ -165,7 +173,6 @@ export default function Profile() {
         </TouchableOpacity>
       </View>
 
-      {/* Stats */}
       <View style={styles.statsRow}>
         <View style={styles.stat}>
           <Text style={styles.statVal}>{poids} kg</Text>
@@ -183,7 +190,6 @@ export default function Profile() {
         </View>
       </View>
 
-      {/* Objectif */}
       <View style={styles.infoCard}>
         <Text style={styles.infoLabel}>OBJECTIF</Text>
         <Text style={styles.infoVal}>
@@ -191,7 +197,6 @@ export default function Profile() {
         </Text>
       </View>
 
-      {/* Niveau */}
       <View style={styles.infoCard}>
         <Text style={styles.infoLabel}>NIVEAU</Text>
         <Text style={styles.infoVal}>
@@ -199,7 +204,6 @@ export default function Profile() {
         </Text>
       </View>
 
-      {/* Seances */}
       <View style={styles.infoCard}>
         <Text style={styles.infoLabel}>SEANCES</Text>
         <View style={styles.seancesRow}>
@@ -218,9 +222,12 @@ export default function Profile() {
         </View>
       </View>
 
-      {/* Menu */}
-      {['Mes programmes', 'Historique des seances', 'Parametres', 'Deconnexion'].map((item, i) => (
-        <TouchableOpacity key={i} style={styles.menuItem}>
+      {MENU.map((item, i) => (
+        <TouchableOpacity
+          key={i}
+          style={styles.menuItem}
+          onPress={() => handleMenu(item)}
+        >
           <Text style={[styles.menuText, item === 'Deconnexion' && { color: '#E63946' }]}>
             {item}
           </Text>
