@@ -8,20 +8,24 @@ import * as Location from 'expo-location';
 
 const CATEGORIES = [
   { id: 'all', label: 'Tout' },
-  { id: 'gym', label: 'Salle(s) de sport',},
-  { id: 'street_workout', label: 'Street Workout'},
-  { id: 'swimming_pool', label: 'Piscines'},
-  { id: 'basketball', label: 'Basket'},
-  { id: 'football', label: 'Terrain de Football'},
-  { id: 'tennis', label: 'Court de tennis' },
+  { id: 'gym', label: 'Salles de sport' },
+  { id: 'street_workout', label: 'Street Workout' },
+  { id: 'swimming_pool', label: 'Piscines' },
+  { id: 'basketball', label: 'Basket' },
+  { id: 'football', label: 'Football' },
+  { id: 'tennis', label: 'Tennis' },
   { id: 'dojo', label: 'Dojos' },
 ];
 
 const COLORS = {
-  gym: '#E63946', street_workout: '#f4a261',
-  swimming_pool: '#4fc3f7', basketball: '#ff9800',
-  football: '#4caf50', tennis: '#cddc39',
-  dojo: '#9c27b0', all: '#E63946',
+  gym: '#E63946',
+  street_workout: '#f4a261',
+  swimming_pool: '#4fc3f7',
+  basketball: '#ff9800',
+  football: '#4caf50',
+  tennis: '#cddc39',
+  dojo: '#9c27b0',
+  all: '#E63946',
 };
 
 export default function Maps() {
@@ -37,14 +41,28 @@ export default function Maps() {
   useEffect(() => { if (location) fetchPlaces(selected); }, [location, selected]);
 
   const getLocation = async () => {
-    const { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== 'granted') {
-      setError('Permission de localisation refusée');
-      setLoading(false);
-      return;
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setError('Permission de localisation refusee');
+        setLoading(false);
+        return;
+      }
+      const loc = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Balanced,
+        timeout: 10000,
+      }).catch(async () => {
+        return await Location.getLastKnownPositionAsync();
+      });
+
+      if (loc) {
+        setLocation(loc.coords);
+      } else {
+        setLocation({ latitude: 48.8566, longitude: 2.3522 });
+      }
+    } catch (e) {
+      setLocation({ latitude: 48.8566, longitude: 2.3522 });
     }
-    const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
-    setLocation(loc.coords);
   };
 
   const fetchPlaces = async (categoryId) => {
@@ -158,7 +176,6 @@ export default function Maps() {
         ))}
       </MapView>
 
-      {/* Filtres */}
       <View style={styles.filtersContainer}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filters}>
           {CATEGORIES.map(cat => (
@@ -167,7 +184,6 @@ export default function Maps() {
               style={[styles.filterBtn, selected === cat.id && styles.filterBtnActive]}
               onPress={() => setSelected(cat.id)}
             >
-              <Text style={styles.filterEmoji}>{cat.emoji}</Text>
               <Text style={[styles.filterLabel, selected === cat.id && styles.filterLabelActive]}>
                 {cat.label}
               </Text>
@@ -176,7 +192,6 @@ export default function Maps() {
         </ScrollView>
       </View>
 
-      {/* Chargement */}
       {loading && (
         <View style={styles.loadingOverlay}>
           <ActivityIndicator color="#E63946" size="small" />
@@ -184,7 +199,6 @@ export default function Maps() {
         </View>
       )}
 
-      {/* Lieu sélectionné */}
       {selectedPlace && (
         <View style={styles.placeCard}>
           <View style={styles.placeInfo}>
@@ -194,15 +208,14 @@ export default function Maps() {
             </Text>
           </View>
           <TouchableOpacity style={styles.itineraryBtn} onPress={() => openItinerary(selectedPlace)}>
-            <Text style={styles.itineraryText}>🗺 Itinéraire</Text>
+            <Text style={styles.itineraryText}>Itineraire</Text>
           </TouchableOpacity>
         </View>
       )}
 
-      {/* Compteur */}
       {!loading && (
         <View style={styles.counter}>
-          <Text style={styles.counterText}>{places.length} lieux trouvés</Text>
+          <Text style={styles.counterText}>{places.length} lieux trouves</Text>
         </View>
       )}
     </View>
@@ -218,13 +231,15 @@ const styles = StyleSheet.create({
   filtersContainer: { position: 'absolute', top: 60, left: 0, right: 0 },
   filters: { paddingHorizontal: 16, gap: 8 },
   filterBtn: {
-    flexDirection: 'row', alignItems: 'center',
-    backgroundColor: 'rgba(17,17,17,0.9)', borderRadius: 20,
-    paddingHorizontal: 14, paddingVertical: 8, gap: 6,
-    borderWidth: 1, borderColor: '#333',
+    alignItems: 'center',
+    backgroundColor: 'rgba(17,17,17,0.9)',
+    borderRadius: 20,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderWidth: 1,
+    borderColor: '#333',
   },
   filterBtnActive: { backgroundColor: '#E63946', borderColor: '#E63946' },
-  filterEmoji: { fontSize: 14 },
   filterLabel: { color: '#aaa', fontSize: 12, fontWeight: '600' },
   filterLabelActive: { color: '#fff' },
   loadingOverlay: {
