@@ -7,6 +7,14 @@
     "orientation": "portrait",
     "platforms": ["ios", "android"],
     "newArchEnabled": true,
-    "assets": ["./assets"]
+    "assets": ["./assets"],
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "NLT a besoin de ta position pour trouver les structures sportives près de toi."
+        }
+      ]
+    ]
   }
 }

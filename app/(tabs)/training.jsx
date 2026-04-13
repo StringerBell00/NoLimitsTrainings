@@ -1,13 +1,16 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { useRouter } from 'expo-router';
 
 const programmes = [
-  { id: 1, titre: 'Full Body', niveau: 'Débutant', duree: '45 min', objectif: 'Forme générale' },
-  { id: 2, titre: 'Push Pull Legs', niveau: 'Intermédiaire', duree: '60 min', objectif: 'Masse musculaire' },
-  { id: 3, titre: 'HIIT Cardio', niveau: 'Avancé', duree: '30 min', objectif: 'Perte de poids' },
-  { id: 4, titre: 'Force & Puissance', niveau: 'Avancé', duree: '75 min', objectif: 'Force maximale' },
+  { id: '1', titre: 'Full Body', niveau: 'Débutant', duree: '45 min', objectif: 'Forme générale' },
+  { id: '2', titre: 'Push Pull Legs', niveau: 'Intermédiaire', duree: '60 min', objectif: 'Masse musculaire' },
+  { id: '3', titre: 'HIIT Cardio', niveau: 'Avancé', duree: '30 min', objectif: 'Perte de poids' },
+  { id: '4', titre: 'Force & Puissance', niveau: 'Avancé', duree: '75 min', objectif: 'Force maximale' },
 ];
 
 export default function Training() {
+  const router = useRouter();
+
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.brand}>NLT</Text>
@@ -15,7 +18,11 @@ export default function Training() {
       <Text style={styles.subtitle}>Choisis ton programme </Text>
 
       {programmes.map((p) => (
-        <TouchableOpacity key={p.id} style={styles.card}>
+        <TouchableOpacity
+          key={p.id}
+          style={styles.card}
+          onPress={() => router.push(`/programme/${p.id}`)}
+        >
           <View style={styles.cardHeader}>
             <Text style={styles.cardTitre}>{p.titre}</Text>
             <Text style={styles.niveau}>{p.niveau}</Text>

@@ -8,4 +8,10 @@ export default function RootLayout() {
       <Stack screenOptions={{ headerShown: false }} />
     </>
   );
-}
+}<Tabs.Screen
+  name="maps"
+  options={{
+    title: 'Carte',
+    tabBarIcon: ({ color }) => <Ionicons name="map" size={24} color={color} />
+  }}
+/>

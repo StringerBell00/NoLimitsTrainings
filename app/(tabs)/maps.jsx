@@ -1,0 +1,253 @@
+import { useState, useEffect, useRef } from 'react';
+import {
+  View, Text, StyleSheet, TouchableOpacity,
+  ScrollView, Linking, Platform, ActivityIndicator
+} from 'react-native';
+import MapView, { Marker } from 'react-native-maps';
+import * as Location from 'expo-location';
+
+const CATEGORIES = [
+  { id: 'all', label: 'Tout' },
+  { id: 'gym', label: 'Salle(s) de sport',},
+  { id: 'street_workout', label: 'Street Workout'},
+  { id: 'swimming_pool', label: 'Piscines'},
+  { id: 'basketball', label: 'Basket'},
+  { id: 'football', label: 'Terrain de Football'},
+  { id: 'tennis', label: 'Court de tennis' },
+  { id: 'dojo', label: 'Dojos' },
+];
+
+const COLORS = {
+  gym: '#E63946', street_workout: '#f4a261',
+  swimming_pool: '#4fc3f7', basketball: '#ff9800',
+  football: '#4caf50', tennis: '#cddc39',
+  dojo: '#9c27b0', all: '#E63946',
+};
+
+export default function Maps() {
+  const [location, setLocation] = useState(null);
+  const [places, setPlaces] = useState([]);
+  const [selected, setSelected] = useState('all');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [selectedPlace, setSelectedPlace] = useState(null);
+  const mapRef = useRef(null);
+
+  useEffect(() => { getLocation(); }, []);
+  useEffect(() => { if (location) fetchPlaces(selected); }, [location, selected]);
+
+  const getLocation = async () => {
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') {
+      setError('Permission de localisation refusée');
+      setLoading(false);
+      return;
+    }
+    const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
+    setLocation(loc.coords);
+  };
+
+  const fetchPlaces = async (categoryId) => {
+    setLoading(true);
+    setPlaces([]);
+    setSelectedPlace(null);
+    const { latitude, longitude } = location;
+    const radius = 3000;
+
+    const query = `
+      [out:json];
+      (
+        node["leisure"="fitness_centre"](around:${radius},${latitude},${longitude});
+        node["leisure"="sports_centre"](around:${radius},${latitude},${longitude});
+        node["leisure"="swimming_pool"](around:${radius},${latitude},${longitude});
+        node["leisure"="pitch"](around:${radius},${latitude},${longitude});
+        node["sport"](around:${radius},${latitude},${longitude});
+        way["leisure"="fitness_centre"](around:${radius},${latitude},${longitude});
+        way["leisure"="sports_centre"](around:${radius},${latitude},${longitude});
+        way["leisure"="swimming_pool"](around:${radius},${latitude},${longitude});
+        way["leisure"="pitch"](around:${radius},${latitude},${longitude});
+      );
+      out center;
+    `;
+
+    try {
+      const res = await fetch('https://overpass-api.de/api/interpreter', {
+        method: 'POST',
+        body: query,
+      });
+      const data = await res.json();
+
+      const filtered = data.elements
+        .filter(el => el.lat || el.center?.lat)
+        .map(el => ({
+          id: el.id,
+          name: el.tags?.name || 'Structure sportive',
+          lat: el.lat || el.center?.lat,
+          lon: el.lon || el.center?.lon,
+          type: detectType(el.tags),
+        }))
+        .filter(el => categoryId === 'all' || el.type === categoryId)
+        .slice(0, 40);
+
+      setPlaces(filtered);
+    } catch (e) {
+      setError('Erreur de chargement des lieux');
+    }
+    setLoading(false);
+  };
+
+  const detectType = (tags) => {
+    if (!tags) return 'all';
+    const sport = tags.sport || '';
+    const leisure = tags.leisure || '';
+    const name = (tags.name || '').toLowerCase();
+    if (sport.includes('swimming') || leisure === 'swimming_pool' || name.includes('piscine')) return 'swimming_pool';
+    if (sport.includes('basketball') || name.includes('basket')) return 'basketball';
+    if (sport.includes('soccer') || sport.includes('football') || name.includes('foot')) return 'football';
+    if (sport.includes('tennis') || name.includes('tennis')) return 'tennis';
+    if (sport.includes('martial') || name.includes('dojo') || name.includes('judo')) return 'dojo';
+    if (name.includes('street workout') || name.includes('calisthen')) return 'street_workout';
+    if (leisure === 'fitness_centre' || name.includes('gym') || name.includes('fitness')) return 'gym';
+    return 'all';
+  };
+
+  const openItinerary = (place) => {
+    const url = Platform.OS === 'ios'
+      ? `maps://?daddr=${place.lat},${place.lon}`
+      : `google.navigation:q=${place.lat},${place.lon}`;
+    Linking.openURL(url).catch(() =>
+      Linking.openURL(`https://www.google.com/maps/dir/?api=1&destination=${place.lat},${place.lon}`)
+    );
+  };
+
+  if (error) return (
+    <View style={styles.center}>
+      <Text style={styles.errorText}>{error}</Text>
+    </View>
+  );
+
+  if (!location) return (
+    <View style={styles.center}>
+      <ActivityIndicator color="#E63946" size="large" />
+      <Text style={styles.loadingText}>Localisation en cours...</Text>
+    </View>
+  );
+
+  return (
+    <View style={styles.container}>
+      <MapView
+        ref={mapRef}
+        style={styles.map}
+        initialRegion={{
+          latitude: location.latitude,
+          longitude: location.longitude,
+          latitudeDelta: 0.05,
+          longitudeDelta: 0.05,
+        }}
+        showsUserLocation
+        showsMyLocationButton
+      >
+        {places.map(place => (
+          <Marker
+            key={place.id}
+            coordinate={{ latitude: place.lat, longitude: place.lon }}
+            title={place.name}
+            pinColor={COLORS[place.type] || '#E63946'}
+            onPress={() => setSelectedPlace(place)}
+          />
+        ))}
+      </MapView>
+
+      {/* Filtres */}
+      <View style={styles.filtersContainer}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filters}>
+          {CATEGORIES.map(cat => (
+            <TouchableOpacity
+              key={cat.id}
+              style={[styles.filterBtn, selected === cat.id && styles.filterBtnActive]}
+              onPress={() => setSelected(cat.id)}
+            >
+              <Text style={styles.filterEmoji}>{cat.emoji}</Text>
+              <Text style={[styles.filterLabel, selected === cat.id && styles.filterLabelActive]}>
+                {cat.label}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
+
+      {/* Chargement */}
+      {loading && (
+        <View style={styles.loadingOverlay}>
+          <ActivityIndicator color="#E63946" size="small" />
+          <Text style={styles.loadingText}>  Recherche en cours...</Text>
+        </View>
+      )}
+
+      {/* Lieu sélectionné */}
+      {selectedPlace && (
+        <View style={styles.placeCard}>
+          <View style={styles.placeInfo}>
+            <Text style={styles.placeName}>{selectedPlace.name}</Text>
+            <Text style={styles.placeType}>
+              {CATEGORIES.find(c => c.id === selectedPlace.type)?.label || 'Sport'}
+            </Text>
+          </View>
+          <TouchableOpacity style={styles.itineraryBtn} onPress={() => openItinerary(selectedPlace)}>
+            <Text style={styles.itineraryText}>🗺 Itinéraire</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {/* Compteur */}
+      {!loading && (
+        <View style={styles.counter}>
+          <Text style={styles.counterText}>{places.length} lieux trouvés</Text>
+        </View>
+      )}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#111' },
+  map: { flex: 1 },
+  center: { flex: 1, backgroundColor: '#111', alignItems: 'center', justifyContent: 'center' },
+  errorText: { color: '#E63946', fontSize: 16, textAlign: 'center', padding: 24 },
+  loadingText: { color: '#aaa', marginTop: 12, fontSize: 14 },
+  filtersContainer: { position: 'absolute', top: 60, left: 0, right: 0 },
+  filters: { paddingHorizontal: 16, gap: 8 },
+  filterBtn: {
+    flexDirection: 'row', alignItems: 'center',
+    backgroundColor: 'rgba(17,17,17,0.9)', borderRadius: 20,
+    paddingHorizontal: 14, paddingVertical: 8, gap: 6,
+    borderWidth: 1, borderColor: '#333',
+  },
+  filterBtnActive: { backgroundColor: '#E63946', borderColor: '#E63946' },
+  filterEmoji: { fontSize: 14 },
+  filterLabel: { color: '#aaa', fontSize: 12, fontWeight: '600' },
+  filterLabelActive: { color: '#fff' },
+  loadingOverlay: {
+    position: 'absolute', bottom: 100, alignSelf: 'center',
+    backgroundColor: 'rgba(17,17,17,0.9)', borderRadius: 20,
+    paddingHorizontal: 20, paddingVertical: 10,
+    flexDirection: 'row', alignItems: 'center',
+  },
+  placeCard: {
+    position: 'absolute', bottom: 90, left: 16, right: 16,
+    backgroundColor: '#1a1a1a', borderRadius: 16, padding: 16,
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    borderLeftWidth: 4, borderLeftColor: '#E63946',
+  },
+  placeInfo: { flex: 1, marginRight: 12 },
+  placeName: { color: '#fff', fontSize: 15, fontWeight: 'bold', marginBottom: 4 },
+  placeType: { color: '#aaa', fontSize: 13 },
+  itineraryBtn: { backgroundColor: '#E63946', borderRadius: 10, paddingHorizontal: 16, paddingVertical: 10 },
+  itineraryText: { color: '#fff', fontWeight: 'bold', fontSize: 13 },
+  counter: {
+    position: 'absolute', top: 110, alignSelf: 'center',
+    backgroundColor: 'rgba(17,17,17,0.8)', borderRadius: 12,
+    paddingHorizontal: 12, paddingVertical: 6,
+  },
+  counterText: { color: '#aaa', fontSize: 11 },
+});
