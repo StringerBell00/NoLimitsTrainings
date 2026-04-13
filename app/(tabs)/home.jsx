@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useLangue } from '../LangueContext';
 
 const PROGRAMME_DU_JOUR = {
   id: '1',
@@ -28,18 +29,17 @@ const STATS_SEMAINE = [
 
 export default function Home() {
   const router = useRouter();
+  const { t } = useLangue();
 
   const repaisFaits = REPAS_DU_JOUR.filter(r => r.fait).length;
   const seancesSemaine = STATS_SEMAINE.filter(s => s.fait).length;
 
   return (
     <ScrollView style={styles.container}>
-
-      {/* Header */}
       <View style={styles.header}>
         <View>
           <Text style={styles.brand}>NLT</Text>
-          <Text style={styles.bonjour}>Bonjour, Sidib</Text>
+          <Text style={styles.bonjour}>{t.bonjour}, Sidib</Text>
           <Text style={styles.date}>Lundi 13 Avril 2026</Text>
         </View>
         <TouchableOpacity
@@ -52,25 +52,23 @@ export default function Home() {
         </TouchableOpacity>
       </View>
 
-      {/* Stats rapides */}
       <View style={styles.statsRow}>
         <View style={styles.statCard}>
           <Text style={styles.statVal}>{seancesSemaine}</Text>
-          <Text style={styles.statLabel}>Seances ce mois</Text>
+          <Text style={styles.statLabel}>{t.seancesCeMois}</Text>
         </View>
         <View style={styles.statCard}>
           <Text style={styles.statVal}>87%</Text>
-          <Text style={styles.statLabel}>Assiduite</Text>
+          <Text style={styles.statLabel}>{t.assiduite}</Text>
         </View>
         <View style={styles.statCard}>
           <Text style={styles.statVal}>1750</Text>
-          <Text style={styles.statLabel}>Kcal brulees</Text>
+          <Text style={styles.statLabel}>{t.kcalBrulees}</Text>
         </View>
       </View>
 
-      {/* Activite semaine */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>CETTE SEMAINE</Text>
+        <Text style={styles.sectionTitle}>{t.cetteSemaine}</Text>
         <View style={styles.semaineRow}>
           {STATS_SEMAINE.map((j, i) => (
             <View key={i} style={styles.jourCol}>
@@ -81,9 +79,8 @@ export default function Home() {
         </View>
       </View>
 
-      {/* Programme du jour */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>PROGRAMME DU JOUR</Text>
+        <Text style={styles.sectionTitle}>{t.programmeDuJour}</Text>
         <TouchableOpacity
           style={styles.programmeCard}
           onPress={() => router.push(`/programme/${PROGRAMME_DU_JOUR.id}`)}
@@ -95,18 +92,17 @@ export default function Home() {
             </Text>
           </View>
           <View style={styles.programmeBtn}>
-            <Text style={styles.programmeBtnText}>Commencer</Text>
+            <Text style={styles.programmeBtnText}>{t.commencer}</Text>
           </View>
         </TouchableOpacity>
       </View>
 
-      {/* Nutrition du jour */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>NUTRITION DU JOUR</Text>
+        <Text style={styles.sectionTitle}>{t.nutritionDuJour}</Text>
         <View style={styles.nutritionCard}>
           <View style={styles.nutritionHeader}>
             <Text style={styles.nutritionKcal}>2100 kcal</Text>
-            <Text style={styles.nutritionSous}>Objectif journalier</Text>
+            <Text style={styles.nutritionSous}>{t.kcalParJour}</Text>
           </View>
           <View style={styles.repasRow}>
             {REPAS_DU_JOUR.map((r, i) => (
@@ -125,9 +121,8 @@ export default function Home() {
         </View>
       </View>
 
-      {/* Coaches */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>TES COACHES</Text>
+        <Text style={styles.sectionTitle}>{t.tesCoaches}</Text>
         <TouchableOpacity
           style={styles.coachCard}
           onPress={() => router.push('/(tabs)/coaches')}
@@ -138,47 +133,46 @@ export default function Home() {
           <View style={styles.coachInfo}>
             <Text style={styles.coachNom}>Karim B.</Text>
             <Text style={styles.coachSpecialite}>Musculation et Force</Text>
-            <Text style={styles.coachDispo}>Disponible aujourd hui</Text>
+            <Text style={styles.coachDispo}>{t.disponible}</Text>
           </View>
           <TouchableOpacity
             style={styles.reserverBtn}
             onPress={() => router.push('/booking/Karim B.')}
           >
-            <Text style={styles.reserverBtnText}>Reserver</Text>
+            <Text style={styles.reserverBtnText}>{t.reserver}</Text>
           </TouchableOpacity>
         </TouchableOpacity>
       </View>
 
-      {/* Acces rapides */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>ACCES RAPIDES</Text>
+        <Text style={styles.sectionTitle}>{t.accesRapides}</Text>
         <View style={styles.raccourcisGrid}>
           <TouchableOpacity
             style={styles.raccourci}
             onPress={() => router.push('/(tabs)/catalogue')}
           >
-            <Text style={styles.raccourciTitre}>Exercices</Text>
+            <Text style={styles.raccourciTitre}>{t.exercices}</Text>
             <Text style={styles.raccourciSous}>30 exercices</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.raccourci}
             onPress={() => router.push('/(tabs)/maps')}
           >
-            <Text style={styles.raccourciTitre}>Carte</Text>
+            <Text style={styles.raccourciTitre}>{t.carte}</Text>
             <Text style={styles.raccourciSous}>Salles proches</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.raccourci}
             onPress={() => router.push('/(tabs)/progression')}
           >
-            <Text style={styles.raccourciTitre}>Stats</Text>
-            <Text style={styles.raccourciSous}>Voir progression</Text>
+            <Text style={styles.raccourciTitre}>{t.stats}</Text>
+            <Text style={styles.raccourciSous}>{t.progression}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.raccourci}
             onPress={() => router.push('/(tabs)/nutrition')}
           >
-            <Text style={styles.raccourciTitre}>Nutrition</Text>
+            <Text style={styles.raccourciTitre}>{t.nutrition}</Text>
             <Text style={styles.raccourciSous}>Plan du jour</Text>
           </TouchableOpacity>
         </View>
@@ -240,10 +234,7 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   jourCol: { alignItems: 'center', gap: 8 },
-  jourPoint: {
-    width: 32, height: 32, borderRadius: 16,
-    backgroundColor: '#2a2a2a',
-  },
+  jourPoint: { width: 32, height: 32, borderRadius: 16, backgroundColor: '#2a2a2a' },
   jourPointActif: { backgroundColor: '#E63946' },
   jourLabel: { color: '#555', fontSize: 11 },
   programmeCard: {
@@ -266,33 +257,17 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   programmeBtnText: { color: '#fff', fontWeight: 'bold', fontSize: 13 },
-  nutritionCard: {
-    backgroundColor: '#1a1a1a',
-    borderRadius: 16,
-    padding: 20,
-  },
+  nutritionCard: { backgroundColor: '#1a1a1a', borderRadius: 16, padding: 20 },
   nutritionHeader: { marginBottom: 16 },
   nutritionKcal: { color: '#fff', fontSize: 22, fontWeight: 'bold' },
   nutritionSous: { color: '#666', fontSize: 12, marginTop: 2 },
   repasRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 16 },
   repasItem: { alignItems: 'center', gap: 6 },
-  repasPoint: {
-    width: 12, height: 12, borderRadius: 6,
-    backgroundColor: '#2a2a2a',
-  },
+  repasPoint: { width: 12, height: 12, borderRadius: 6, backgroundColor: '#2a2a2a' },
   repasPointActif: { backgroundColor: '#4caf50' },
   repasLabel: { color: '#555', fontSize: 10 },
-  nutritionProgress: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  progressBar: {
-    flex: 1, height: 6,
-    backgroundColor: '#2a2a2a',
-    borderRadius: 3,
-    overflow: 'hidden',
-  },
+  nutritionProgress: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  progressBar: { flex: 1, height: 6, backgroundColor: '#2a2a2a', borderRadius: 3, overflow: 'hidden' },
   progressFill: { height: '100%', backgroundColor: '#E63946', borderRadius: 3 },
   progressText: { color: '#666', fontSize: 12 },
   coachCard: {
