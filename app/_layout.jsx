@@ -1,24 +1,22 @@
-import { Tabs } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { Stack } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import { LangueProvider } from './LangueContext';
 
-export default function TabsLayout() {
+export default function RootLayout() {
   return (
-    <Tabs
-      screenOptions={{
-        headerShown: false,
-        tabBarStyle: { backgroundColor: '#111', borderTopColor: '#222' },
-        tabBarActiveTintColor: '#E63946',
-        tabBarInactiveTintColor: '#666',
-      }}
-    >
-      <Tabs.Screen name="home" options={{ title: 'Accueil', tabBarIcon: ({ color }) => <Ionicons name="home" size={24} color={color} /> }} />
-      <Tabs.Screen name="training" options={{ title: 'Training', tabBarIcon: ({ color }) => <Ionicons name="barbell" size={24} color={color} /> }} />
-      <Tabs.Screen name="catalogue" options={{ title: 'Exercices', tabBarIcon: ({ color }) => <Ionicons name="library" size={24} color={color} /> }} />
-      <Tabs.Screen name="nutrition" options={{ title: 'Nutrition', tabBarIcon: ({ color }) => <Ionicons name="nutrition" size={24} color={color} /> }} />
-      <Tabs.Screen name="coaches" options={{ title: 'Coaches', tabBarIcon: ({ color }) => <Ionicons name="people" size={24} color={color} /> }} />
-      <Tabs.Screen name="maps" options={{ title: 'Carte', tabBarIcon: ({ color }) => <Ionicons name="map" size={24} color={color} /> }} />
-      <Tabs.Screen name="progression" options={{ title: 'Stats', tabBarIcon: ({ color }) => <Ionicons name="stats-chart" size={24} color={color} /> }} />
-      <Tabs.Screen name="profile" options={{ title: 'Profil', tabBarIcon: ({ color }) => <Ionicons name="person" size={24} color={color} /> }} />
-    </Tabs>
+    <LangueProvider>
+      <StatusBar style="light" />
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="index" />
+        <Stack.Screen name="onboarding" />
+        <Stack.Screen name="login" />
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="programme/[id]" />
+        <Stack.Screen name="booking/[coach]" />
+        <Stack.Screen name="notifications" />
+        <Stack.Screen name="parametres" />
+        <Stack.Screen name="timer" />
+      </Stack>
+    </LangueProvider>
   );
 }

@@ -175,6 +175,13 @@ export default function Home() {
             <Text style={styles.raccourciTitre}>{t.nutrition}</Text>
             <Text style={styles.raccourciSous}>Plan du jour</Text>
           </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.raccourci}
+            onPress={() => router.push('/timer')}
+          >
+            <Text style={styles.raccourciTitre}>Timer</Text>
+            <Text style={styles.raccourciSous}>Tabata / HIIT</Text>
+          </TouchableOpacity>
         </View>
       </View>
 
