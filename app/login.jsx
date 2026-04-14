@@ -1,15 +1,47 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
+import {
+  View, Text, StyleSheet, TouchableOpacity,
+  TextInput, KeyboardAvoidingView, Platform, Alert, ActivityIndicator
+} from 'react-native';
 import { router } from 'expo-router';
+import { useAuth } from './AuthContext';
 
 export default function Login() {
+  const { inscription, connexion } = useAuth();
   const [mode, setMode] = useState('login');
   const [email, setEmail] = useState('');
   const [motDePasse, setMotDePasse] = useState('');
   const [nom, setNom] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const continuer = () => {
-    router.replace('/(tabs)/home');
+  const continuer = async () => {
+    if (!email || !motDePasse) {
+      Alert.alert('Champs manquants', 'Remplis tous les champs.');
+      return;
+    }
+    if (mode === 'register' && !nom) {
+      Alert.alert('Champs manquants', 'Entre ton nom.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      if (mode === 'login') {
+        await connexion(email, motDePasse);
+      } else {
+        await inscription(email, motDePasse, nom);
+      }
+      router.replace('/(tabs)/home');
+    } catch (error) {
+      let message = 'Une erreur est survenue.';
+      if (error.code === 'auth/user-not-found') message = 'Aucun compte avec cet email.';
+      if (error.code === 'auth/wrong-password') message = 'Mot de passe incorrect.';
+      if (error.code === 'auth/email-already-in-use') message = 'Cet email est deja utilise.';
+      if (error.code === 'auth/weak-password') message = 'Mot de passe trop faible (6 caracteres minimum).';
+      if (error.code === 'auth/invalid-email') message = 'Email invalide.';
+      Alert.alert('Erreur', message);
+    }
+    setLoading(false);
   };
 
   return (
@@ -18,7 +50,6 @@ export default function Login() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <View style={styles.inner}>
-
         <Text style={styles.brand}>NLT</Text>
         <Text style={styles.titre}>
           {mode === 'login' ? 'Connexion' : 'Inscription'}
@@ -72,10 +103,18 @@ export default function Login() {
           </TouchableOpacity>
         )}
 
-        <TouchableOpacity style={styles.btn} onPress={continuer}>
-          <Text style={styles.btnText}>
-            {mode === 'login' ? 'Se connecter' : "S'inscrire"}
-          </Text>
+        <TouchableOpacity
+          style={[styles.btn, loading && { opacity: 0.7 }]}
+          onPress={continuer}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.btnText}>
+              {mode === 'login' ? 'Se connecter' : "S'inscrire"}
+            </Text>
+          )}
         </TouchableOpacity>
 
         <View style={styles.separateur}>
@@ -84,7 +123,10 @@ export default function Login() {
           <View style={styles.ligne} />
         </View>
 
-        <TouchableOpacity style={styles.btnSecondaire} onPress={() => router.replace('/(tabs)/home')}>
+        <TouchableOpacity
+          style={styles.btnSecondaire}
+          onPress={() => router.replace('/(tabs)/home')}
+        >
           <Text style={styles.btnSecondaireText}>Continuer sans compte</Text>
         </TouchableOpacity>
 
@@ -96,50 +138,19 @@ export default function Login() {
             {mode === 'login' ? "Pas encore de compte ? S'inscrire" : 'Deja un compte ? Se connecter'}
           </Text>
         </TouchableOpacity>
-
       </View>
     </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#111',
-  },
-  inner: {
-    flex: 1,
-    paddingHorizontal: 24,
-    paddingTop: 80,
-    paddingBottom: 40,
-  },
-  brand: {
-    color: '#E63946',
-    fontSize: 14,
-    fontWeight: 'bold',
-    letterSpacing: 4,
-    marginBottom: 32,
-  },
-  titre: {
-    color: '#fff',
-    fontSize: 30,
-    fontWeight: 'bold',
-    marginBottom: 8,
-  },
-  sous: {
-    color: '#666',
-    fontSize: 15,
-    marginBottom: 40,
-  },
-  inputContainer: {
-    marginBottom: 20,
-  },
-  label: {
-    color: '#aaa',
-    fontSize: 13,
-    marginBottom: 8,
-    fontWeight: '600',
-  },
+  container: { flex: 1, backgroundColor: '#111' },
+  inner: { flex: 1, paddingHorizontal: 24, paddingTop: 80, paddingBottom: 40 },
+  brand: { color: '#E63946', fontSize: 14, fontWeight: 'bold', letterSpacing: 4, marginBottom: 32 },
+  titre: { color: '#fff', fontSize: 30, fontWeight: 'bold', marginBottom: 8 },
+  sous: { color: '#666', fontSize: 15, marginBottom: 40 },
+  inputContainer: { marginBottom: 20 },
+  label: { color: '#aaa', fontSize: 13, marginBottom: 8, fontWeight: '600' },
   input: {
     backgroundColor: '#1a1a1a',
     borderRadius: 12,
@@ -149,14 +160,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#2a2a2a',
   },
-  oublie: {
-    alignSelf: 'flex-end',
-    marginBottom: 28,
-  },
-  oublieText: {
-    color: '#E63946',
-    fontSize: 13,
-  },
+  oublie: { alignSelf: 'flex-end', marginBottom: 28 },
+  oublieText: { color: '#E63946', fontSize: 13 },
   btn: {
     backgroundColor: '#E63946',
     borderRadius: 14,
@@ -164,26 +169,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 24,
   },
-  btnText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  separateur: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    marginBottom: 24,
-  },
-  ligne: {
-    flex: 1,
-    height: 1,
-    backgroundColor: '#222',
-  },
-  ou: {
-    color: '#444',
-    fontSize: 13,
-  },
+  btnText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
+  separateur: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 24 },
+  ligne: { flex: 1, height: 1, backgroundColor: '#222' },
+  ou: { color: '#444', fontSize: 13 },
   btnSecondaire: {
     borderWidth: 1,
     borderColor: '#333',
@@ -192,15 +181,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 24,
   },
-  btnSecondaireText: {
-    color: '#aaa',
-    fontSize: 15,
-  },
-  switch: {
-    alignItems: 'center',
-  },
-  switchText: {
-    color: '#E63946',
-    fontSize: 14,
-  },
+  btnSecondaireText: { color: '#aaa', fontSize: 15 },
+  switch: { alignItems: 'center' },
+  switchText: { color: '#E63946', fontSize: 14 },
 });
