@@ -33,13 +33,7 @@ export default function Login() {
       }
       router.replace('/(tabs)/home');
     } catch (error) {
-      let message = 'Une erreur est survenue.';
-      if (error.code === 'auth/user-not-found') message = 'Aucun compte avec cet email.';
-      if (error.code === 'auth/wrong-password') message = 'Mot de passe incorrect.';
-      if (error.code === 'auth/email-already-in-use') message = 'Cet email est deja utilise.';
-      if (error.code === 'auth/weak-password') message = 'Mot de passe trop faible (6 caracteres minimum).';
-      if (error.code === 'auth/invalid-email') message = 'Email invalide.';
-      Alert.alert('Erreur', message);
+      Alert.alert('Erreur', error.message || 'Une erreur est survenue.');
     }
     setLoading(false);
   };

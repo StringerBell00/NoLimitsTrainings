@@ -1,43 +1,29 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged,
-  updateProfile,
-} from 'firebase/auth';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
-import { auth, db } from './firebase';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [userData, setUserData] = useState(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        setUser(firebaseUser);
-        const docRef = doc(db, 'users', firebaseUser.uid);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          setUserData(docSnap.data());
-        }
-      } else {
-        setUser(null);
-        setUserData(null);
-      }
-      setLoading(false);
-    });
-    return unsubscribe;
+    chargerUtilisateur();
   }, []);
 
+  const chargerUtilisateur = async () => {
+    try {
+      const data = await AsyncStorage.getItem('nlt_user');
+      if (data) setUser(JSON.parse(data));
+    } catch (e) {
+      console.log('Erreur chargement user:', e);
+    }
+    setLoading(false);
+  };
+
   const inscription = async (email, motDePasse, nom) => {
-    const result = await createUserWithEmailAndPassword(auth, email, motDePasse);
-    await updateProfile(result.user, { displayName: nom });
-    await setDoc(doc(db, 'users', result.user.uid), {
+    const nouvelUser = {
+      id: Date.now().toString(),
       nom,
       email,
       objectif: 'prise_masse',
@@ -46,28 +32,35 @@ export function AuthProvider({ children }) {
       taille: '',
       age: '',
       createdAt: new Date().toISOString(),
-    });
-    return result;
+    };
+    await AsyncStorage.setItem('nlt_user', JSON.stringify(nouvelUser));
+    setUser(nouvelUser);
+    return nouvelUser;
   };
 
   const connexion = async (email, motDePasse) => {
-    return await signInWithEmailAndPassword(auth, email, motDePasse);
+    const data = await AsyncStorage.getItem('nlt_user');
+    if (!data) throw new Error('Aucun compte trouve');
+    const savedUser = JSON.parse(data);
+    if (savedUser.email !== email) throw new Error('Email incorrect');
+    setUser(savedUser);
+    return savedUser;
   };
 
   const deconnexion = async () => {
-    await signOut(auth);
+    await AsyncStorage.removeItem('nlt_user');
+    setUser(null);
   };
 
   const mettreAJourProfil = async (donnees) => {
-    if (!user) return;
-    await setDoc(doc(db, 'users', user.uid), donnees, { merge: true });
-    setUserData(prev => ({ ...prev, ...donnees }));
+    const updated = { ...user, ...donnees };
+    await AsyncStorage.setItem('nlt_user', JSON.stringify(updated));
+    setUser(updated);
   };
 
   return (
     <AuthContext.Provider value={{
       user,
-      userData,
       loading,
       inscription,
       connexion,
