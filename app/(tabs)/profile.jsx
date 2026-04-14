@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import {
   View, Text, StyleSheet, ScrollView,
-  TouchableOpacity, TextInput, Alert
+  TouchableOpacity, TextInput, Alert, Image
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useLangue } from '../LangueContext';
+import * as ImagePicker from 'expo-image-picker';
 
 const OBJECTIFS = [
   { id: 'perte_poids', label: 'Perte de poids' },
@@ -31,6 +32,7 @@ export default function Profile() {
   const [age, setAge] = useState('25');
   const [objectif, setObjectif] = useState('prise_masse');
   const [niveau, setNiveau] = useState('intermediaire');
+  const [photo, setPhoto] = useState(null);
 
   const sauvegarder = () => {
     setMode('view');
@@ -43,6 +45,57 @@ export default function Profile() {
     if (item === t.deconnexion) router.replace('/login');
   };
 
+  const changerPhoto = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission refusee', 'Autorise l acces a ta pellicule dans les parametres.');
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+
+    if (!result.canceled && result.assets[0]) {
+      setPhoto(result.assets[0].uri);
+    }
+  };
+
+  const prendrePhoto = async () => {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission refusee', 'Autorise l acces a ta camera dans les parametres.');
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+
+    if (!result.canceled && result.assets[0]) {
+      setPhoto(result.assets[0].uri);
+    }
+  };
+
+  const afficherOptionsPhoto = () => {
+    Alert.alert(
+      'Photo de profil',
+      'Choisis une option',
+      [
+        { text: 'Pellicule', onPress: changerPhoto },
+        { text: 'Camera', onPress: prendrePhoto },
+        { text: 'Annuler', style: 'cancel' },
+      ]
+    );
+  };
+
+  const MENU = [t.mesProgrammes, t.historiqueSeances, t.notifications, t.parametres, t.deconnexion];
+
   if (mode === 'edit') {
     return (
       <ScrollView style={styles.container}>
@@ -51,6 +104,23 @@ export default function Profile() {
         </TouchableOpacity>
 
         <Text style={styles.titre}>{t.modifierProfil}</Text>
+
+        {/* Photo edition */}
+        <View style={styles.avatarSectionEdit}>
+          <TouchableOpacity onPress={afficherOptionsPhoto}>
+            {photo ? (
+              <Image source={{ uri: photo }} style={styles.avatarImage} />
+            ) : (
+              <View style={styles.avatar}>
+                <Text style={styles.avatarText}>{nom[0]}</Text>
+              </View>
+            )}
+            <View style={styles.photoEditBtn}>
+              <Text style={styles.photoEditText}>+</Text>
+            </View>
+          </TouchableOpacity>
+          <Text style={styles.changerPhotoText}>Appuie pour changer la photo</Text>
+        </View>
 
         <Text style={styles.sectionTitle}>INFORMATIONS</Text>
 
@@ -108,16 +178,23 @@ export default function Profile() {
     );
   }
 
-  const MENU = [t.mesProgrammes, t.historiqueSeances, t.notifications, t.parametres, t.deconnexion];
-
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.brand}>NLT</Text>
 
       <View style={styles.avatarSection}>
-        <View style={styles.avatar}>
-          <Text style={styles.avatarText}>{nom[0]}</Text>
-        </View>
+        <TouchableOpacity onPress={afficherOptionsPhoto} style={styles.avatarWrapper}>
+          {photo ? (
+            <Image source={{ uri: photo }} style={styles.avatarImage} />
+          ) : (
+            <View style={styles.avatar}>
+              <Text style={styles.avatarText}>{nom[0]}</Text>
+            </View>
+          )}
+          <View style={styles.photoEditBtn}>
+            <Text style={styles.photoEditText}>+</Text>
+          </View>
+        </TouchableOpacity>
         <Text style={styles.nom}>{nom}</Text>
         <Text style={styles.email}>{email}</Text>
         <TouchableOpacity style={styles.editBtn} onPress={() => setMode('edit')}>
@@ -206,8 +283,26 @@ const styles = StyleSheet.create({
   saveBtn: { backgroundColor: '#E63946', borderRadius: 14, padding: 18, alignItems: 'center', marginTop: 32 },
   saveBtnText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
   avatarSection: { alignItems: 'center', marginVertical: 32 },
-  avatar: { width: 90, height: 90, borderRadius: 45, backgroundColor: '#E63946', alignItems: 'center', justifyContent: 'center', marginBottom: 14 },
-  avatarText: { color: '#fff', fontSize: 36, fontWeight: 'bold' },
+  avatarSectionEdit: { alignItems: 'center', marginBottom: 32 },
+  avatarWrapper: { position: 'relative', marginBottom: 12 },
+  avatar: { width: 100, height: 100, borderRadius: 50, backgroundColor: '#E63946', alignItems: 'center', justifyContent: 'center' },
+  avatarImage: { width: 100, height: 100, borderRadius: 50, borderWidth: 3, borderColor: '#E63946' },
+  avatarText: { color: '#fff', fontSize: 40, fontWeight: 'bold' },
+  photoEditBtn: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: '#E63946',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: '#111',
+  },
+  photoEditText: { color: '#fff', fontSize: 20, fontWeight: 'bold', lineHeight: 24 },
+  changerPhotoText: { color: '#555', fontSize: 13, marginTop: 8 },
   nom: { color: '#fff', fontSize: 22, fontWeight: 'bold' },
   email: { color: '#666', fontSize: 13, marginTop: 4, marginBottom: 16 },
   editBtn: { borderWidth: 1, borderColor: '#E63946', borderRadius: 20, paddingHorizontal: 20, paddingVertical: 8 },
