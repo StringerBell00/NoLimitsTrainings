@@ -19,6 +19,7 @@ export default function RootLayout() {
           <Stack.Screen name="notifications" />
           <Stack.Screen name="parametres" />
           <Stack.Screen name="timer" />
+          <Stack.Screen name="recherche" />
         </Stack>
       </LangueProvider>
     </AuthProvider>

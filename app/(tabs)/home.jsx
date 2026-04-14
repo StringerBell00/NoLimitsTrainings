@@ -40,16 +40,24 @@ export default function Home() {
         <View>
           <Text style={styles.brand}>NLT</Text>
           <Text style={styles.bonjour}>{t.bonjour}, Sidib</Text>
-          <Text style={styles.date}>Lundi 13 Avril 2026</Text>
+          <Text style={styles.date}>Lundi 14 Avril 2026</Text>
         </View>
-        <TouchableOpacity
-          style={styles.avatarBtn}
-          onPress={() => router.push('/(tabs)/profile')}
-        >
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>S</Text>
-          </View>
-        </TouchableOpacity>
+        <View style={styles.headerRight}>
+          <TouchableOpacity
+            style={styles.rechercheBtn}
+            onPress={() => router.push('/recherche')}
+          >
+            <Text style={styles.rechercheBtnText}>🔍</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.avatarBtn}
+            onPress={() => router.push('/(tabs)/profile')}
+          >
+            <View style={styles.avatar}>
+              <Text style={styles.avatarText}>S</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
       </View>
 
       <View style={styles.statsRow}>
@@ -128,16 +136,16 @@ export default function Home() {
           onPress={() => router.push('/(tabs)/coaches')}
         >
           <View style={styles.coachAvatar}>
-            <Text style={styles.coachAvatarText}>K</Text>
+            <Text style={styles.coachAvatarText}>M</Text>
           </View>
           <View style={styles.coachInfo}>
-            <Text style={styles.coachNom}>Karim B.</Text>
+            <Text style={styles.coachNom}>Mohamed-Lamine S.</Text>
             <Text style={styles.coachSpecialite}>Musculation et Force</Text>
             <Text style={styles.coachDispo}>{t.disponible}</Text>
           </View>
           <TouchableOpacity
             style={styles.reserverBtn}
-            onPress={() => router.push('/booking/Karim B.')}
+            onPress={() => router.push('/booking/Mohamed-Lamine S.')}
           >
             <Text style={styles.reserverBtnText}>{t.reserver}</Text>
           </TouchableOpacity>
@@ -182,6 +190,13 @@ export default function Home() {
             <Text style={styles.raccourciTitre}>Timer</Text>
             <Text style={styles.raccourciSous}>Tabata / HIIT</Text>
           </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.raccourci}
+            onPress={() => router.push('/recherche')}
+          >
+            <Text style={styles.raccourciTitre}>Recherche</Text>
+            <Text style={styles.raccourciSous}>Tout trouver</Text>
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -203,6 +218,13 @@ const styles = StyleSheet.create({
   brand: { color: '#E63946', fontSize: 12, fontWeight: 'bold', letterSpacing: 4, marginBottom: 8 },
   bonjour: { color: '#fff', fontSize: 24, fontWeight: 'bold' },
   date: { color: '#555', fontSize: 13, marginTop: 4 },
+  headerRight: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  rechercheBtn: {
+    width: 40, height: 40, borderRadius: 20,
+    backgroundColor: '#1a1a1a',
+    alignItems: 'center', justifyContent: 'center',
+  },
+  rechercheBtnText: { fontSize: 18 },
   avatarBtn: {},
   avatar: {
     width: 48, height: 48, borderRadius: 24,
@@ -210,59 +232,26 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
   },
   avatarText: { color: '#fff', fontSize: 20, fontWeight: 'bold' },
-  statsRow: {
-    flexDirection: 'row',
-    gap: 10,
-    paddingHorizontal: 24,
-    marginBottom: 24,
-  },
-  statCard: {
-    flex: 1,
-    backgroundColor: '#1a1a1a',
-    borderRadius: 14,
-    padding: 14,
-    alignItems: 'center',
-  },
+  statsRow: { flexDirection: 'row', gap: 10, paddingHorizontal: 24, marginBottom: 24 },
+  statCard: { flex: 1, backgroundColor: '#1a1a1a', borderRadius: 14, padding: 14, alignItems: 'center' },
   statVal: { color: '#E63946', fontSize: 20, fontWeight: 'bold' },
   statLabel: { color: '#666', fontSize: 10, marginTop: 4, textAlign: 'center' },
   section: { paddingHorizontal: 24, marginBottom: 24 },
-  sectionTitle: {
-    color: '#E63946',
-    fontSize: 11,
-    fontWeight: 'bold',
-    letterSpacing: 3,
-    marginBottom: 14,
-  },
-  semaineRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    backgroundColor: '#1a1a1a',
-    borderRadius: 14,
-    padding: 16,
-  },
+  sectionTitle: { color: '#E63946', fontSize: 11, fontWeight: 'bold', letterSpacing: 3, marginBottom: 14 },
+  semaineRow: { flexDirection: 'row', justifyContent: 'space-between', backgroundColor: '#1a1a1a', borderRadius: 14, padding: 16 },
   jourCol: { alignItems: 'center', gap: 8 },
   jourPoint: { width: 32, height: 32, borderRadius: 16, backgroundColor: '#2a2a2a' },
   jourPointActif: { backgroundColor: '#E63946' },
   jourLabel: { color: '#555', fontSize: 11 },
   programmeCard: {
-    backgroundColor: '#1a1a1a',
-    borderRadius: 16,
-    padding: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    borderLeftWidth: 4,
-    borderLeftColor: '#E63946',
+    backgroundColor: '#1a1a1a', borderRadius: 16, padding: 20,
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    borderLeftWidth: 4, borderLeftColor: '#E63946',
   },
   programmeInfo: { flex: 1 },
   programmeNom: { color: '#fff', fontSize: 18, fontWeight: 'bold', marginBottom: 6 },
   programmeMeta: { color: '#666', fontSize: 13 },
-  programmeBtn: {
-    backgroundColor: '#E63946',
-    borderRadius: 10,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-  },
+  programmeBtn: { backgroundColor: '#E63946', borderRadius: 10, paddingHorizontal: 16, paddingVertical: 10 },
   programmeBtnText: { color: '#fff', fontWeight: 'bold', fontSize: 13 },
   nutritionCard: { backgroundColor: '#1a1a1a', borderRadius: 16, padding: 20 },
   nutritionHeader: { marginBottom: 16 },
@@ -278,39 +267,21 @@ const styles = StyleSheet.create({
   progressFill: { height: '100%', backgroundColor: '#E63946', borderRadius: 3 },
   progressText: { color: '#666', fontSize: 12 },
   coachCard: {
-    backgroundColor: '#1a1a1a',
-    borderRadius: 16,
-    padding: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 14,
+    backgroundColor: '#1a1a1a', borderRadius: 16, padding: 16,
+    flexDirection: 'row', alignItems: 'center', gap: 14,
   },
-  coachAvatar: {
-    width: 48, height: 48, borderRadius: 24,
-    backgroundColor: '#E63946',
-    alignItems: 'center', justifyContent: 'center',
-  },
+  coachAvatar: { width: 48, height: 48, borderRadius: 24, backgroundColor: '#E63946', alignItems: 'center', justifyContent: 'center' },
   coachAvatarText: { color: '#fff', fontSize: 20, fontWeight: 'bold' },
   coachInfo: { flex: 1 },
   coachNom: { color: '#fff', fontSize: 15, fontWeight: 'bold' },
   coachSpecialite: { color: '#666', fontSize: 12, marginTop: 2 },
   coachDispo: { color: '#4caf50', fontSize: 11, marginTop: 4 },
-  reserverBtn: {
-    backgroundColor: '#E63946',
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-  },
+  reserverBtn: { backgroundColor: '#E63946', borderRadius: 10, paddingHorizontal: 14, paddingVertical: 8 },
   reserverBtnText: { color: '#fff', fontWeight: 'bold', fontSize: 12 },
   raccourcisGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
   raccourci: {
-    flex: 1,
-    minWidth: '45%',
-    backgroundColor: '#1a1a1a',
-    borderRadius: 14,
-    padding: 16,
-    borderLeftWidth: 3,
-    borderLeftColor: '#E63946',
+    flex: 1, minWidth: '45%', backgroundColor: '#1a1a1a',
+    borderRadius: 14, padding: 16, borderLeftWidth: 3, borderLeftColor: '#E63946',
   },
   raccourciTitre: { color: '#fff', fontSize: 15, fontWeight: 'bold', marginBottom: 4 },
   raccourciSous: { color: '#555', fontSize: 12 },
