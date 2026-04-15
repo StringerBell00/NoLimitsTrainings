@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { router } from 'expo-router';
+import { useTheme } from './ThemeContext';
 
 const DEFIS = [
   {
@@ -98,6 +99,8 @@ const DIFFICULTE_COULEURS = {
 };
 
 export default function Defis() {
+  const { theme } = useTheme();
+  const s = createStyles(theme);
   const [onglet, setOnglet] = useState('actifs');
   const [defisRejoints, setDefisRejoints] = useState([1, 2, 3]);
 
@@ -110,52 +113,45 @@ export default function Defis() {
   const totalPoints = DEFIS_TERMINES.length * 150;
 
   return (
-    <ScrollView style={styles.container}>
-      <TouchableOpacity style={styles.back} onPress={() => router.back()}>
-        <Text style={styles.backText}>Retour</Text>
+    <ScrollView style={s.container}>
+      <TouchableOpacity style={s.back} onPress={() => router.back()}>
+        <Text style={s.backText}>Retour</Text>
       </TouchableOpacity>
 
-      <Text style={styles.brand}>NLT</Text>
-      <Text style={styles.titre}>Defis</Text>
-      <Text style={styles.sous}>Releve les challenges de la semaine</Text>
+      <Text style={s.brand}>NLT</Text>
+      <Text style={s.titre}>Defis</Text>
+      <Text style={s.sous}>Releve les challenges de la semaine</Text>
 
-      {/* Stats */}
-      <View style={styles.statsRow}>
-        <View style={styles.statCard}>
-          <Text style={styles.statVal}>{defisRejoints.length}</Text>
-          <Text style={styles.statLabel}>En cours</Text>
+      <View style={s.statsRow}>
+        <View style={s.statCard}>
+          <Text style={s.statVal}>{defisRejoints.length}</Text>
+          <Text style={s.statLabel}>En cours</Text>
         </View>
-        <View style={styles.statCard}>
-          <Text style={styles.statVal}>{DEFIS_TERMINES.length}</Text>
-          <Text style={styles.statLabel}>Termines</Text>
+        <View style={s.statCard}>
+          <Text style={s.statVal}>{DEFIS_TERMINES.length}</Text>
+          <Text style={s.statLabel}>Termines</Text>
         </View>
-        <View style={styles.statCard}>
-          <Text style={styles.statVal}>{totalPoints}</Text>
-          <Text style={styles.statLabel}>Points gagnes</Text>
+        <View style={s.statCard}>
+          <Text style={s.statVal}>{totalPoints}</Text>
+          <Text style={s.statLabel}>Points gagnes</Text>
         </View>
       </View>
 
-      {/* Onglets */}
-      <View style={styles.onglets}>
+      <View style={s.onglets}>
         <TouchableOpacity
-          style={[styles.onglet, onglet === 'actifs' && styles.ongletActif]}
+          style={[s.onglet, onglet === 'actifs' && s.ongletActif]}
           onPress={() => setOnglet('actifs')}
         >
-          <Text style={[styles.ongletText, onglet === 'actifs' && styles.ongletTextActif]}>
-            Defis actifs
-          </Text>
+          <Text style={[s.ongletText, onglet === 'actifs' && s.ongletTextActif]}>Defis actifs</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.onglet, onglet === 'termines' && styles.ongletActif]}
+          style={[s.onglet, onglet === 'termines' && s.ongletActif]}
           onPress={() => setOnglet('termines')}
         >
-          <Text style={[styles.ongletText, onglet === 'termines' && styles.ongletTextActif]}>
-            Termines
-          </Text>
+          <Text style={[s.ongletText, onglet === 'termines' && s.ongletTextActif]}>Termines</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Defis actifs */}
       {onglet === 'actifs' && (
         <View>
           {DEFIS.map(d => {
@@ -163,55 +159,50 @@ export default function Defis() {
             const pct = Math.min((d.progression / d.total) * 100, 100);
 
             return (
-              <View key={d.id} style={styles.defiCard}>
-
-                {/* Header */}
-                <View style={styles.defiHeader}>
-                  <View style={styles.defiTitreRow}>
-                    <Text style={styles.defiTitre}>{d.titre}</Text>
-                    <View style={[styles.difficulteBadge, { backgroundColor: DIFFICULTE_COULEURS[d.difficulte] + '22' }]}>
-                      <Text style={[styles.difficulteTexte, { color: DIFFICULTE_COULEURS[d.difficulte] }]}>
+              <View key={d.id} style={s.defiCard}>
+                <View style={s.defiHeader}>
+                  <View style={s.defiTitreRow}>
+                    <Text style={s.defiTitre}>{d.titre}</Text>
+                    <View style={[s.difficulteBadge, { backgroundColor: DIFFICULTE_COULEURS[d.difficulte] + '22' }]}>
+                      <Text style={[s.difficulteTexte, { color: DIFFICULTE_COULEURS[d.difficulte] }]}>
                         {d.difficulte}
                       </Text>
                     </View>
                   </View>
-                  <Text style={styles.defiDescription}>{d.description}</Text>
+                  <Text style={s.defiDescription}>{d.description}</Text>
                 </View>
 
-                {/* Progression */}
                 {rejoint && (
-                  <View style={styles.progressionSection}>
-                    <View style={styles.progressionHeader}>
-                      <Text style={styles.progressionLabel}>Progression</Text>
-                      <Text style={[styles.progressionVal, { color: d.couleur }]}>
+                  <View style={s.progressionSection}>
+                    <View style={s.progressionHeader}>
+                      <Text style={s.progressionLabel}>Progression</Text>
+                      <Text style={[s.progressionVal, { color: d.couleur }]}>
                         {d.progression} / {d.total}
                         {d.type === 'calories' ? ' kcal' : d.type === 'regularite' ? ' jours' : ''}
                       </Text>
                     </View>
-                    <View style={styles.progressionBarre}>
-                      <View style={[styles.progressionFill, { width: `${pct}%`, backgroundColor: d.couleur }]} />
+                    <View style={s.progressionBarre}>
+                      <View style={[s.progressionFill, { width: `${pct}%`, backgroundColor: d.couleur }]} />
                     </View>
-                    <Text style={styles.progressionPct}>{Math.round(pct)}% complete</Text>
+                    <Text style={s.progressionPct}>{Math.round(pct)}% complete</Text>
                   </View>
                 )}
 
-                {/* Footer */}
-                <View style={styles.defiFooter}>
-                  <View style={styles.defiInfos}>
-                    <Text style={styles.defiExpire}>Expire dans {d.expire}</Text>
-                    <Text style={styles.defiParticipants}>{d.participants} participants</Text>
+                <View style={s.defiFooter}>
+                  <View>
+                    <Text style={s.defiExpire}>Expire dans {d.expire}</Text>
+                    <Text style={s.defiParticipants}>{d.participants} participants</Text>
                   </View>
-                  <View style={styles.recompenseTag}>
-                    <Text style={styles.recompenseTexte}>{d.recompense}</Text>
+                  <View style={s.recompenseTag}>
+                    <Text style={s.recompenseTexte}>{d.recompense}</Text>
                   </View>
                 </View>
 
-                {/* Bouton */}
                 <TouchableOpacity
-                  style={[styles.defiBtn, rejoint && { backgroundColor: '#1a3a1a', borderColor: '#4caf50' }]}
+                  style={[s.defiBtn, rejoint && s.defiBtnRejoint]}
                   onPress={() => rejoindre(d.id)}
                 >
-                  <Text style={[styles.defiBtnText, rejoint && { color: '#4caf50' }]}>
+                  <Text style={[s.defiBtnText, rejoint && s.defiBtnTextRejoint]}>
                     {rejoint ? 'Defi rejoint' : 'Rejoindre le defi'}
                   </Text>
                 </TouchableOpacity>
@@ -221,30 +212,22 @@ export default function Defis() {
         </View>
       )}
 
-      {/* Defis termines */}
       {onglet === 'termines' && (
         <View>
           {DEFIS_TERMINES.map((d, i) => (
-            <View key={i} style={styles.termineCard}>
-              <View style={styles.termineIcone}>
-                <Text style={styles.termineIconeTexte}>🏆</Text>
+            <View key={i} style={s.termineCard}>
+              <View style={s.termineIcone}>
+                <Text style={s.termineIconeTexte}>★</Text>
               </View>
-              <View style={styles.termineInfo}>
-                <Text style={styles.termineNom}>{d.titre}</Text>
-                <Text style={styles.termineDate}>{d.date}</Text>
+              <View style={s.termineInfo}>
+                <Text style={s.termineNom}>{d.titre}</Text>
+                <Text style={s.termineDate}>{d.date}</Text>
               </View>
-              <View style={styles.termineRecompense}>
-                <Text style={styles.termineRecompenseTexte}>{d.recompense}</Text>
+              <View style={s.termineRecompense}>
+                <Text style={s.termineRecompenseTexte}>{d.recompense}</Text>
               </View>
             </View>
           ))}
-
-          {DEFIS_TERMINES.length === 0 && (
-            <View style={styles.vide}>
-              <Text style={styles.videTexte}>Pas encore de defis termines</Text>
-              <Text style={styles.videConseils}>Rejoins un defi pour commencer !</Text>
-            </View>
-          )}
         </View>
       )}
 
@@ -253,61 +236,51 @@ export default function Defis() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#111', paddingHorizontal: 24 },
+const createStyles = (theme) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: theme.bg, paddingHorizontal: 24 },
   back: { marginTop: 60, marginBottom: 8 },
-  backText: { color: '#E63946', fontSize: 16 },
-  brand: { color: '#E63946', fontSize: 12, fontWeight: 'bold', letterSpacing: 4, marginBottom: 8 },
-  titre: { color: '#fff', fontSize: 28, fontWeight: 'bold', marginTop: 4 },
-  sous: { color: '#aaa', fontSize: 15, marginTop: 4, marginBottom: 24 },
+  backText: { color: theme.accent, fontSize: 16 },
+  brand: { color: theme.accent, fontSize: 12, fontWeight: 'bold', letterSpacing: 4, marginBottom: 8 },
+  titre: { color: theme.texte, fontSize: 28, fontWeight: 'bold', marginTop: 4 },
+  sous: { color: theme.texteSous, fontSize: 15, marginTop: 4, marginBottom: 24 },
   statsRow: { flexDirection: 'row', gap: 12, marginBottom: 24 },
-  statCard: { flex: 1, backgroundColor: '#1a1a1a', borderRadius: 14, padding: 14, alignItems: 'center', borderLeftWidth: 3, borderLeftColor: '#E63946' },
-  statVal: { color: '#E63946', fontSize: 22, fontWeight: 'bold' },
-  statLabel: { color: '#aaa', fontSize: 11, marginTop: 4 },
-  onglets: { flexDirection: 'row', marginBottom: 20, borderBottomWidth: 1, borderBottomColor: '#2a2a2a' },
+  statCard: { flex: 1, backgroundColor: theme.card, borderRadius: 14, padding: 14, alignItems: 'center', borderLeftWidth: 3, borderLeftColor: theme.accent },
+  statVal: { color: theme.accent, fontSize: 22, fontWeight: 'bold' },
+  statLabel: { color: theme.texteSous, fontSize: 11, marginTop: 4 },
+  onglets: { flexDirection: 'row', marginBottom: 20, borderBottomWidth: 1, borderBottomColor: theme.bordure },
   onglet: { flex: 1, paddingVertical: 12, alignItems: 'center' },
-  ongletActif: { borderBottomWidth: 2, borderBottomColor: '#E63946' },
-  ongletText: { color: '#555', fontSize: 14, fontWeight: '600' },
-  ongletTextActif: { color: '#E63946' },
-  defiCard: { backgroundColor: '#1a1a1a', borderRadius: 20, padding: 20, marginBottom: 16 },
+  ongletActif: { borderBottomWidth: 2, borderBottomColor: theme.accent },
+  ongletText: { color: theme.texteFaible, fontSize: 14, fontWeight: '600' },
+  ongletTextActif: { color: theme.accent },
+  defiCard: { backgroundColor: theme.card, borderRadius: 20, padding: 20, marginBottom: 16 },
   defiHeader: { marginBottom: 16 },
   defiTitreRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
-  defiTitre: { color: '#fff', fontSize: 17, fontWeight: 'bold', flex: 1 },
+  defiTitre: { color: theme.texte, fontSize: 17, fontWeight: 'bold', flex: 1 },
   difficulteBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20 },
   difficulteTexte: { fontSize: 11, fontWeight: 'bold' },
-  defiDescription: { color: '#aaa', fontSize: 14, lineHeight: 20 },
+  defiDescription: { color: theme.texteSous, fontSize: 14, lineHeight: 20 },
   progressionSection: { marginBottom: 16 },
   progressionHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 },
-  progressionLabel: { color: '#555', fontSize: 12 },
+  progressionLabel: { color: theme.texteFaible, fontSize: 12 },
   progressionVal: { fontSize: 13, fontWeight: 'bold' },
-  progressionBarre: { height: 8, backgroundColor: '#2a2a2a', borderRadius: 4, overflow: 'hidden', marginBottom: 4 },
+  progressionBarre: { height: 8, backgroundColor: theme.card2, borderRadius: 4, overflow: 'hidden', marginBottom: 4 },
   progressionFill: { height: '100%', borderRadius: 4 },
-  progressionPct: { color: '#555', fontSize: 11 },
+  progressionPct: { color: theme.texteFaible, fontSize: 11 },
   defiFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 },
-  defiInfos: {},
-  defiExpire: { color: '#E63946', fontSize: 12, fontWeight: 'bold' },
-  defiParticipants: { color: '#555', fontSize: 11, marginTop: 2 },
+  defiExpire: { color: theme.accent, fontSize: 12, fontWeight: 'bold' },
+  defiParticipants: { color: theme.texteFaible, fontSize: 11, marginTop: 2 },
   recompenseTag: { backgroundColor: '#1a3a1a', borderRadius: 12, paddingHorizontal: 12, paddingVertical: 6 },
   recompenseTexte: { color: '#4caf50', fontSize: 12, fontWeight: 'bold' },
-  defiBtn: {
-    borderWidth: 1, borderColor: '#E63946',
-    borderRadius: 12, paddingVertical: 12,
-    alignItems: 'center',
-  },
-  defiBtnText: { color: '#E63946', fontWeight: 'bold', fontSize: 14 },
-  termineCard: {
-    flexDirection: 'row', alignItems: 'center',
-    backgroundColor: '#1a1a1a', borderRadius: 14,
-    padding: 16, marginBottom: 10, gap: 14,
-  },
-  termineIcone: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#2a2a2a', alignItems: 'center', justifyContent: 'center' },
-  termineIconeTexte: { fontSize: 22 },
+  defiBtn: { borderWidth: 1, borderColor: theme.accent, borderRadius: 12, paddingVertical: 12, alignItems: 'center' },
+  defiBtnRejoint: { backgroundColor: '#1a3a1a', borderColor: '#4caf50' },
+  defiBtnText: { color: theme.accent, fontWeight: 'bold', fontSize: 14 },
+  defiBtnTextRejoint: { color: '#4caf50' },
+  termineCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: theme.card, borderRadius: 14, padding: 16, marginBottom: 10, gap: 14 },
+  termineIcone: { width: 44, height: 44, borderRadius: 22, backgroundColor: theme.card2, alignItems: 'center', justifyContent: 'center' },
+  termineIconeTexte: { color: '#ffd700', fontSize: 22 },
   termineInfo: { flex: 1 },
-  termineNom: { color: '#fff', fontSize: 15, fontWeight: 'bold' },
-  termineDate: { color: '#555', fontSize: 12, marginTop: 2 },
+  termineNom: { color: theme.texte, fontSize: 15, fontWeight: 'bold' },
+  termineDate: { color: theme.texteFaible, fontSize: 12, marginTop: 2 },
   termineRecompense: { backgroundColor: '#1a3a1a', borderRadius: 12, paddingHorizontal: 10, paddingVertical: 6 },
   termineRecompenseTexte: { color: '#4caf50', fontSize: 12, fontWeight: 'bold' },
-  vide: { alignItems: 'center', paddingTop: 60 },
-  videTexte: { color: '#aaa', fontSize: 16, marginBottom: 8 },
-  videConseils: { color: '#555', fontSize: 13 },
 });

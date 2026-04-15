@@ -4,6 +4,7 @@ import {
   TextInput, KeyboardAvoidingView, Platform, Image
 } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
+import { useTheme } from '../ThemeContext';
 
 const COACHES_INFO = {
   'Mohamed-Lamine S.': {
@@ -37,7 +38,7 @@ const REPONSES_AUTO = [
   'Pour la perte de poids, combine cardio et musculation pour de meilleurs resultats.',
   'N oublie pas de t echauffer avant chaque seance pour eviter les blessures.',
   'Je te recommande de suivre tes progres chaque semaine pour rester motive.',
-  'La regularite est la cle du succes. Mieux vaut 3 seances par semaine pendant 6 mois qu une periode intensive.',
+  'La regularite est la cle du succes. Mieux vaut 3 seances par semaine pendant 6 mois.',
   'Pour tes proteines, vise 1.6 a 2g par kg de poids de corps par jour.',
 ];
 
@@ -51,6 +52,8 @@ const SUGGESTIONS = [
 
 export default function Chat() {
   const { coach } = useLocalSearchParams();
+  const { theme } = useTheme();
+  const s = createStyles(theme);
   const coachInfo = COACHES_INFO[coach] || COACHES_INFO['Mohamed-Lamine S.'];
   const [messages, setMessages] = useState(MESSAGES_INITIAUX);
   const [texte, setTexte] = useState('');
@@ -92,67 +95,64 @@ export default function Chat() {
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={s.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      {/* Header */}
-      <View style={styles.header}>
+      <View style={s.header}>
         <TouchableOpacity onPress={() => router.back()}>
-          <Text style={styles.retour}>←</Text>
+          <Text style={s.retour}>←</Text>
         </TouchableOpacity>
-        <View style={styles.headerInfo}>
-          <Image source={{ uri: coachInfo.photo }} style={styles.headerPhoto} />
+        <View style={s.headerInfo}>
+          <Image source={{ uri: coachInfo.photo }} style={s.headerPhoto} />
           <View>
-            <Text style={styles.headerNom}>{coach}</Text>
-            <Text style={styles.headerStatut}>{coachInfo.statut}</Text>
+            <Text style={s.headerNom}>{coach}</Text>
+            <Text style={s.headerStatut}>{coachInfo.statut}</Text>
           </View>
         </View>
         <TouchableOpacity
-          style={styles.reserverBtn}
+          style={s.reserverBtn}
           onPress={() => router.push(`/booking/${coach}`)}
         >
-          <Text style={styles.reserverBtnText}>Reserver</Text>
+          <Text style={s.reserverBtnText}>Reserver</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Infos coach */}
-      <View style={styles.coachBanner}>
-        <Text style={styles.coachBannerText}>
+      <View style={s.coachBanner}>
+        <Text style={s.coachBannerText}>
           {coachInfo.specialite} • Repond generalement en moins d 1h
         </Text>
       </View>
 
-      {/* Messages */}
       <ScrollView
         ref={scrollRef}
-        style={styles.messagesContainer}
-        contentContainerStyle={styles.messagesContent}
+        style={s.messagesContainer}
+        contentContainerStyle={s.messagesContent}
         showsVerticalScrollIndicator={false}
       >
-        {messages.map((m, i) => (
+        {messages.map((m) => (
           <View
             key={m.id}
             style={[
-              styles.messageWrapper,
-              m.auteur === 'user' ? styles.messageWrapperUser : styles.messageWrapperCoach,
+              s.messageWrapper,
+              m.auteur === 'user' ? s.messageWrapperUser : s.messageWrapperCoach,
             ]}
           >
             {m.auteur === 'coach' && (
-              <Image source={{ uri: coachInfo.photo }} style={styles.messageAvatar} />
+              <Image source={{ uri: coachInfo.photo }} style={s.messageAvatar} />
             )}
             <View style={[
-              styles.messageBulle,
-              m.auteur === 'user' ? styles.messageBulleUser : styles.messageBulleCoach,
+              s.messageBulle,
+              m.auteur === 'user' ? s.messageBulleUser : s.messageBulleCoach,
             ]}>
               <Text style={[
-                styles.messageTexte,
-                m.auteur === 'user' ? styles.messageTexteUser : styles.messageTexteCoach,
+                s.messageTexte,
+                m.auteur === 'user' ? s.messageTexteUser : s.messageTexteCoach,
               ]}>
                 {m.texte}
               </Text>
               <Text style={[
-                styles.messageHeure,
-                m.auteur === 'user' ? styles.messageHeureUser : styles.messageHeureCoach,
+                s.messageHeure,
+                m.auteur === 'user' ? s.messageHeureUser : s.messageHeureCoach,
               ]}>
                 {m.heure}
               </Text>
@@ -160,129 +160,104 @@ export default function Chat() {
           </View>
         ))}
 
-        {/* Indicateur en train d ecrire */}
         {enTrain && (
-          <View style={styles.messageWrapper}>
-            <Image source={{ uri: coachInfo.photo }} style={styles.messageAvatar} />
-            <View style={styles.typingBulle}>
-              <Text style={styles.typingTexte}>...</Text>
+          <View style={s.messageWrapper}>
+            <Image source={{ uri: coachInfo.photo }} style={s.messageAvatar} />
+            <View style={s.typingBulle}>
+              <Text style={s.typingTexte}>...</Text>
             </View>
           </View>
         )}
       </ScrollView>
 
-      {/* Suggestions */}
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        style={styles.suggestionsScroll}
-        contentContainerStyle={styles.suggestionsContent}
+        style={s.suggestionsScroll}
+        contentContainerStyle={s.suggestionsContent}
       >
-        {SUGGESTIONS.map((s, i) => (
+        {SUGGESTIONS.map((su, i) => (
           <TouchableOpacity
             key={i}
-            style={styles.suggestionBadge}
-            onPress={() => envoyerMessage(s)}
+            style={s.suggestionBadge}
+            onPress={() => envoyerMessage(su)}
           >
-            <Text style={styles.suggestionTexte}>{s}</Text>
+            <Text style={s.suggestionTexte}>{su}</Text>
           </TouchableOpacity>
         ))}
       </ScrollView>
 
-      {/* Input */}
-      <View style={styles.inputContainer}>
+      <View style={s.inputContainer}>
         <TextInput
-          style={styles.input}
+          style={s.input}
           placeholder="Ecris un message..."
-          placeholderTextColor="#444"
+          placeholderTextColor={theme.texteFaible}
           value={texte}
           onChangeText={setTexte}
           multiline
           maxLength={500}
-          color="#fff"
+          color={theme.texte}
         />
         <TouchableOpacity
-          style={[styles.sendBtn, !texte.trim() && styles.sendBtnDisabled]}
+          style={[s.sendBtn, !texte.trim() && s.sendBtnDisabled]}
           onPress={() => envoyerMessage(texte)}
           disabled={!texte.trim()}
         >
-          <Text style={styles.sendBtnText}>→</Text>
+          <Text style={s.sendBtnText}>→</Text>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#111' },
+const createStyles = (theme) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: theme.bg },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 24,
-    paddingTop: 60,
-    paddingBottom: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#1a1a1a',
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingHorizontal: 24, paddingTop: 60, paddingBottom: 16,
+    borderBottomWidth: 1, borderBottomColor: theme.bordure,
   },
-  retour: { color: '#E63946', fontSize: 24, fontWeight: 'bold' },
+  retour: { color: theme.accent, fontSize: 24, fontWeight: 'bold' },
   headerInfo: { flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1, marginLeft: 16 },
-  headerPhoto: { width: 42, height: 42, borderRadius: 21, backgroundColor: '#2a2a2a' },
-  headerNom: { color: '#fff', fontSize: 15, fontWeight: 'bold' },
+  headerPhoto: { width: 42, height: 42, borderRadius: 21, backgroundColor: theme.card2 },
+  headerNom: { color: theme.texte, fontSize: 15, fontWeight: 'bold' },
   headerStatut: { color: '#4caf50', fontSize: 12, marginTop: 2 },
-  reserverBtn: { backgroundColor: '#E63946', borderRadius: 20, paddingHorizontal: 14, paddingVertical: 7 },
+  reserverBtn: { backgroundColor: theme.accent, borderRadius: 20, paddingHorizontal: 14, paddingVertical: 7 },
   reserverBtnText: { color: '#fff', fontSize: 12, fontWeight: 'bold' },
-  coachBanner: { backgroundColor: '#1a1a1a', padding: 10, alignItems: 'center' },
-  coachBannerText: { color: '#555', fontSize: 12 },
+  coachBanner: { backgroundColor: theme.card, padding: 10, alignItems: 'center' },
+  coachBannerText: { color: theme.texteFaible, fontSize: 12 },
   messagesContainer: { flex: 1 },
   messagesContent: { padding: 16, gap: 12 },
   messageWrapper: { flexDirection: 'row', alignItems: 'flex-end', gap: 8, marginBottom: 4 },
   messageWrapperUser: { flexDirection: 'row-reverse' },
   messageWrapperCoach: { flexDirection: 'row' },
-  messageAvatar: { width: 32, height: 32, borderRadius: 16, backgroundColor: '#2a2a2a' },
+  messageAvatar: { width: 32, height: 32, borderRadius: 16, backgroundColor: theme.card2 },
   messageBulle: { maxWidth: '75%', borderRadius: 18, padding: 12 },
-  messageBulleUser: { backgroundColor: '#E63946', borderBottomRightRadius: 4 },
-  messageBulleCoach: { backgroundColor: '#1a1a1a', borderBottomLeftRadius: 4 },
+  messageBulleUser: { backgroundColor: theme.accent, borderBottomRightRadius: 4 },
+  messageBulleCoach: { backgroundColor: theme.card, borderBottomLeftRadius: 4 },
   messageTexte: { fontSize: 15, lineHeight: 22 },
   messageTexteUser: { color: '#fff' },
-  messageTexteCoach: { color: '#fff' },
+  messageTexteCoach: { color: theme.texte },
   messageHeure: { fontSize: 10, marginTop: 4 },
   messageHeureUser: { color: '#ffffff88', textAlign: 'right' },
-  messageHeureCoach: { color: '#555' },
-  typingBulle: { backgroundColor: '#1a1a1a', borderRadius: 18, padding: 12, borderBottomLeftRadius: 4 },
-  typingTexte: { color: '#555', fontSize: 20, letterSpacing: 4 },
+  messageHeureCoach: { color: theme.texteFaible },
+  typingBulle: { backgroundColor: theme.card, borderRadius: 18, padding: 12, borderBottomLeftRadius: 4 },
+  typingTexte: { color: theme.texteFaible, fontSize: 20, letterSpacing: 4 },
   suggestionsScroll: { maxHeight: 50 },
   suggestionsContent: { paddingHorizontal: 16, gap: 8, alignItems: 'center' },
-  suggestionBadge: {
-    backgroundColor: '#1a1a1a', borderRadius: 20,
-    paddingHorizontal: 14, paddingVertical: 8,
-    borderWidth: 1, borderColor: '#E63946',
-  },
-  suggestionTexte: { color: '#E63946', fontSize: 12 },
+  suggestionBadge: { backgroundColor: theme.card, borderRadius: 20, paddingHorizontal: 14, paddingVertical: 8, borderWidth: 1, borderColor: theme.accent },
+  suggestionTexte: { color: theme.accent, fontSize: 12 },
   inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    gap: 12,
-    padding: 16,
-    borderTopWidth: 1,
-    borderTopColor: '#1a1a1a',
+    flexDirection: 'row', alignItems: 'flex-end', gap: 12,
+    padding: 16, borderTopWidth: 1, borderTopColor: theme.bordure,
   },
   input: {
-    flex: 1,
-    backgroundColor: '#1a1a1a',
-    borderRadius: 24,
-    paddingHorizontal: 18,
-    paddingVertical: 12,
-    fontSize: 15,
-    maxHeight: 120,
-    borderWidth: 1,
-    borderColor: '#2a2a2a',
+    flex: 1, backgroundColor: theme.card, borderRadius: 24,
+    paddingHorizontal: 18, paddingVertical: 12,
+    fontSize: 15, maxHeight: 120,
+    borderWidth: 1, borderColor: theme.bordure,
   },
-  sendBtn: {
-    width: 46, height: 46, borderRadius: 23,
-    backgroundColor: '#E63946',
-    alignItems: 'center', justifyContent: 'center',
-  },
-  sendBtnDisabled: { backgroundColor: '#2a2a2a' },
+  sendBtn: { width: 46, height: 46, borderRadius: 23, backgroundColor: theme.accent, alignItems: 'center', justifyContent: 'center' },
+  sendBtnDisabled: { backgroundColor: theme.card2 },
   sendBtnText: { color: '#fff', fontSize: 20, fontWeight: 'bold' },
 });
