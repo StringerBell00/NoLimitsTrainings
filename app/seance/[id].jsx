@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import * as Speech from 'expo-speech';
+import { useTheme } from '../ThemeContext';
 
 const SEANCES = {
   '1': {
@@ -14,7 +15,7 @@ const SEANCES = {
       { id: 1, nom: 'Squat', series: 3, reps: 12, repos: 60, muscle: 'Jambes', consigne: 'Pieds largeur epaules, dos droit' },
       { id: 2, nom: 'Pompes', series: 3, reps: 10, repos: 60, muscle: 'Pectoraux', consigne: 'Corps droit, descends jusqu au sol' },
       { id: 3, nom: 'Rowing haltere', series: 3, reps: 12, repos: 60, muscle: 'Dos', consigne: 'Dos plat, tire vers la hanche' },
-      { id: 4, nom: 'Developpé militaire', series: 3, reps: 10, repos: 60, muscle: 'Epaules', consigne: 'Pousse vers le haut, core engage' },
+      { id: 4, nom: 'Developpe militaire', series: 3, reps: 10, repos: 60, muscle: 'Epaules', consigne: 'Pousse vers le haut, core engage' },
       { id: 5, nom: 'Planche', series: 3, reps: 30, repos: 45, muscle: 'Abdos', consigne: 'Corps droit comme une planche', isTemps: true },
     ],
   },
@@ -22,7 +23,7 @@ const SEANCES = {
     titre: 'Push Pull Legs',
     niveau: 'Intermediaire',
     exercices: [
-      { id: 1, nom: 'Developpé couché', series: 4, reps: 10, repos: 90, muscle: 'Pectoraux', consigne: 'Barre a hauteur de poitrine' },
+      { id: 1, nom: 'Developpe couche', series: 4, reps: 10, repos: 90, muscle: 'Pectoraux', consigne: 'Barre a hauteur de poitrine' },
       { id: 2, nom: 'Elevation laterale', series: 3, reps: 15, repos: 60, muscle: 'Epaules', consigne: 'Coudes legerement flechis' },
       { id: 3, nom: 'Triceps poulie', series: 3, reps: 12, repos: 60, muscle: 'Triceps', consigne: 'Coudes fixes contre le corps' },
       { id: 4, nom: 'Traction', series: 4, reps: 8, repos: 90, muscle: 'Dos', consigne: 'Tire jusqu au menton' },
@@ -55,6 +56,8 @@ const SEANCES = {
 
 export default function Seance() {
   const { id } = useLocalSearchParams();
+  const { theme } = useTheme();
+  const s = createStyles(theme);
   const seance = SEANCES[id];
 
   const [exerciceActuel, setExerciceActuel] = useState(0);
@@ -89,9 +92,7 @@ export default function Seance() {
   }, []);
 
   const parler = (texte) => {
-    if (voixActive) {
-      Speech.speak(texte, { language: 'fr-FR', pitch: 1.0, rate: 0.9 });
-    }
+    if (voixActive) Speech.speak(texte, { language: 'fr-FR', pitch: 1.0, rate: 0.9 });
   };
 
   const demarrerRepos = (duree) => {
@@ -169,156 +170,137 @@ export default function Seance() {
 
   const progressionGlobale = () => {
     const totalSeries = seance.exercices.reduce((acc, e) => acc + e.series, 0);
-    const seriesFaites = repsValidees.length;
-    return seriesFaites / totalSeries;
+    return repsValidees.length / totalSeries;
   };
 
   if (!seance) return (
-    <View style={styles.container}>
-      <Text style={styles.erreur}>Seance introuvable</Text>
+    <View style={s.container}>
+      <Text style={s.erreur}>Seance introuvable</Text>
     </View>
   );
 
   if (seanceTerminee) {
     return (
-      <View style={styles.containerTermine}>
-        <Text style={styles.termineEmoji}>🏆</Text>
-        <Text style={styles.termineTitre}>Seance terminee !</Text>
-        <Text style={styles.termineSous}>{seance.titre}</Text>
-
-        <View style={styles.statsFinales}>
-          <View style={styles.statFinale}>
-            <Text style={styles.statFinaleVal}>{formaterTemps(tempsTotal)}</Text>
-            <Text style={styles.statFinaleLabel}>Duree</Text>
+      <View style={s.containerTermine}>
+        <Text style={s.termineTitre}>Seance terminee !</Text>
+        <Text style={s.termineSous}>{seance.titre}</Text>
+        <View style={s.statsFinales}>
+          <View style={s.statFinale}>
+            <Text style={s.statFinaleVal}>{formaterTemps(tempsTotal)}</Text>
+            <Text style={s.statFinaleLabel}>Duree</Text>
           </View>
-          <View style={styles.statFinale}>
-            <Text style={styles.statFinaleVal}>{seance.exercices.length}</Text>
-            <Text style={styles.statFinaleLabel}>Exercices</Text>
+          <View style={s.statFinale}>
+            <Text style={s.statFinaleVal}>{seance.exercices.length}</Text>
+            <Text style={s.statFinaleLabel}>Exercices</Text>
           </View>
-          <View style={styles.statFinale}>
-            <Text style={styles.statFinaleVal}>{repsValidees.length}</Text>
-            <Text style={styles.statFinaleLabel}>Series</Text>
+          <View style={s.statFinale}>
+            <Text style={s.statFinaleVal}>{repsValidees.length}</Text>
+            <Text style={s.statFinaleLabel}>Series</Text>
           </View>
         </View>
-
-        <TouchableOpacity
-          style={styles.btnTermine}
-          onPress={() => router.back()}
-        >
-          <Text style={styles.btnTermineText}>Retour aux programmes</Text>
+        <TouchableOpacity style={s.btnTermine} onPress={() => router.back()}>
+          <Text style={s.btnTermineText}>Retour aux programmes</Text>
         </TouchableOpacity>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
-
-      {/* Header */}
-      <View style={styles.header}>
+    <View style={s.container}>
+      <View style={s.header}>
         <TouchableOpacity onPress={() => {
           Alert.alert('Quitter', 'Tu veux vraiment quitter la seance ?', [
             { text: 'Non', style: 'cancel' },
             { text: 'Oui', onPress: () => router.back() },
           ]);
         }}>
-          <Text style={styles.quitter}>✕</Text>
+          <Text style={s.quitter}>✕</Text>
         </TouchableOpacity>
-        <View style={styles.headerInfo}>
-          <Text style={styles.headerTitre}>{seance.titre}</Text>
-          <Text style={styles.headerTemps}>{formaterTemps(tempsTotal)}</Text>
+        <View style={s.headerInfo}>
+          <Text style={s.headerTitre}>{seance.titre}</Text>
+          <Text style={s.headerTemps}>{formaterTemps(tempsTotal)}</Text>
         </View>
         <TouchableOpacity onPress={() => setVoixActive(!voixActive)}>
-          <Text style={styles.voixBtn}>{voixActive ? '🔊' : '🔇'}</Text>
+          <Text style={s.voixBtn}>{voixActive ? '🔊' : '🔇'}</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Barre progression globale */}
-      <View style={styles.progressionGlobale}>
-        <View style={[styles.progressionFill, { width: `${progressionGlobale() * 100}%` }]} />
+      <View style={s.progressionGlobale}>
+        <View style={[s.progressionFill, { width: `${progressionGlobale() * 100}%` }]} />
       </View>
 
-      {/* Phase repos */}
       {phase === 'repos' && (
-        <View style={styles.reposContainer}>
-          <Text style={styles.reposLabel}>REPOS</Text>
-          <Text style={styles.reposTemps}>{tempsRepos}</Text>
-          <Text style={styles.reposSous}>secondes</Text>
-          <Text style={styles.prochainExo}>
+        <View style={s.reposContainer}>
+          <Text style={s.reposLabel}>REPOS</Text>
+          <Text style={s.reposTemps}>{tempsRepos}</Text>
+          <Text style={s.reposSous}>secondes</Text>
+          <Text style={s.prochainExo}>
             Prochain : {ex.nom} — Serie {serieActuelle}/{ex.series}
           </Text>
           <TouchableOpacity
-            style={styles.skipBtn}
+            style={s.skipBtn}
             onPress={() => {
               clearInterval(intervalRepos.current);
               setPhase('exercice');
               setTempsRepos(0);
             }}
           >
-            <Text style={styles.skipBtnText}>Passer le repos</Text>
+            <Text style={s.skipBtnText}>Passer le repos</Text>
           </TouchableOpacity>
         </View>
       )}
 
-      {/* Phase exercice */}
       {phase === 'exercice' && (
-        <ScrollView style={styles.exerciceContainer}>
-
-          {/* Exercice actuel */}
-          <View style={styles.exerciceCard}>
-            <View style={styles.exerciceNumero}>
-              <Text style={styles.exerciceNumeroText}>{exerciceActuel + 1}</Text>
+        <ScrollView style={s.exerciceContainer}>
+          <View style={s.exerciceCard}>
+            <View style={s.exerciceNumero}>
+              <Text style={s.exerciceNumeroText}>{exerciceActuel + 1}</Text>
             </View>
-            <View style={styles.exerciceInfo}>
-              <Text style={styles.exerciceNom}>{ex.nom}</Text>
-              <Text style={styles.exerciceMuscle}>{ex.muscle}</Text>
+            <View style={s.exerciceInfo}>
+              <Text style={s.exerciceNom}>{ex.nom}</Text>
+              <Text style={s.exerciceMuscle}>{ex.muscle}</Text>
             </View>
-            <View style={styles.serieBadge}>
-              <Text style={styles.serieBadgeText}>{serieActuelle}/{ex.series}</Text>
+            <View style={s.serieBadge}>
+              <Text style={s.serieBadgeText}>{serieActuelle}/{ex.series}</Text>
             </View>
           </View>
 
-          {/* Consigne */}
-          <View style={styles.consigneCard}>
-            <Text style={styles.consigneLabel}>CONSIGNE</Text>
-            <Text style={styles.consigneText}>{ex.consigne}</Text>
+          <View style={s.consigneCard}>
+            <Text style={s.consigneLabel}>CONSIGNE</Text>
+            <Text style={s.consigneText}>{ex.consigne}</Text>
           </View>
 
-          {/* Reps ou temps */}
-          <View style={styles.repsCard}>
+          <View style={s.repsCard}>
             {ex.isTemps ? (
               <>
-                <Text style={styles.repsLabel}>TEMPS</Text>
-                <Text style={styles.repsVal}>
-                  {actif ? tempsExercice : ex.reps}s
-                </Text>
+                <Text style={s.repsLabel}>TEMPS</Text>
+                <Text style={s.repsVal}>{actif ? tempsExercice : ex.reps}s</Text>
                 {!actif ? (
-                  <TouchableOpacity style={styles.demarrerBtn} onPress={demarrerExerciceTemps}>
-                    <Text style={styles.demarrerBtnText}>Demarrer</Text>
+                  <TouchableOpacity style={s.demarrerBtn} onPress={demarrerExerciceTemps}>
+                    <Text style={s.demarrerBtnText}>Demarrer</Text>
                   </TouchableOpacity>
                 ) : (
-                  <Text style={styles.enCoursText}>En cours...</Text>
+                  <Text style={s.enCoursText}>En cours...</Text>
                 )}
               </>
             ) : (
               <>
-                <Text style={styles.repsLabel}>REPETITIONS</Text>
-                <Text style={styles.repsVal}>{ex.reps}</Text>
-                <TouchableOpacity style={styles.validerBtn} onPress={validerSerie}>
-                  <Text style={styles.validerBtnText}>Serie validee ✓</Text>
+                <Text style={s.repsLabel}>REPETITIONS</Text>
+                <Text style={s.repsVal}>{ex.reps}</Text>
+                <TouchableOpacity style={s.validerBtn} onPress={validerSerie}>
+                  <Text style={s.validerBtnText}>Serie validee ✓</Text>
                 </TouchableOpacity>
               </>
             )}
           </View>
 
-          {/* Series validees */}
-          <View style={styles.seriesRow}>
+          <View style={s.seriesRow}>
             {Array.from({ length: ex.series }).map((_, i) => {
               const key = `${exerciceActuel}-${i + 1}`;
               const validee = repsValidees.includes(key);
               return (
-                <View key={i} style={[styles.serieDot, validee && styles.serieDotValidee]}>
-                  <Text style={[styles.serieDotText, validee && styles.serieDotTextValidee]}>
+                <View key={i} style={[s.serieDot, validee && s.serieDotValidee]}>
+                  <Text style={[s.serieDotText, validee && s.serieDotTextValidee]}>
                     {i + 1}
                   </Text>
                 </View>
@@ -326,12 +308,11 @@ export default function Seance() {
             })}
           </View>
 
-          {/* Exercices suivants */}
-          <Text style={styles.suiteLabel}>EXERCICES SUIVANTS</Text>
+          <Text style={s.suiteLabel}>EXERCICES SUIVANTS</Text>
           {seance.exercices.slice(exerciceActuel + 1).map((e, i) => (
-            <View key={i} style={styles.suiteItem}>
-              <Text style={styles.suiteNom}>{e.nom}</Text>
-              <Text style={styles.suiteMeta}>{e.series}x{e.reps} • {e.muscle}</Text>
+            <View key={i} style={s.suiteItem}>
+              <Text style={s.suiteNom}>{e.nom}</Text>
+              <Text style={s.suiteMeta}>{e.series}x{e.reps} • {e.muscle}</Text>
             </View>
           ))}
 
@@ -342,83 +323,63 @@ export default function Seance() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#111' },
-  containerTermine: { flex: 1, backgroundColor: '#111', alignItems: 'center', justifyContent: 'center', padding: 24 },
-  erreur: { color: '#E63946', fontSize: 16, textAlign: 'center', marginTop: 60 },
+const createStyles = (theme) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: theme.bg },
+  containerTermine: { flex: 1, backgroundColor: theme.bg, alignItems: 'center', justifyContent: 'center', padding: 24 },
+  erreur: { color: theme.accent, fontSize: 16, textAlign: 'center', marginTop: 60 },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 24,
-    paddingTop: 60,
-    paddingBottom: 16,
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingHorizontal: 24, paddingTop: 60, paddingBottom: 16,
   },
-  quitter: { color: '#666', fontSize: 20 },
+  quitter: { color: theme.texteFaible, fontSize: 20 },
   headerInfo: { alignItems: 'center' },
-  headerTitre: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
-  headerTemps: { color: '#E63946', fontSize: 13, marginTop: 2 },
+  headerTitre: { color: theme.texte, fontSize: 16, fontWeight: 'bold' },
+  headerTemps: { color: theme.accent, fontSize: 13, marginTop: 2 },
   voixBtn: { fontSize: 20 },
-  progressionGlobale: {
-    height: 3,
-    backgroundColor: '#2a2a2a',
-    marginHorizontal: 24,
-    borderRadius: 2,
-    overflow: 'hidden',
-    marginBottom: 24,
-  },
-  progressionFill: { height: '100%', backgroundColor: '#E63946', borderRadius: 2 },
+  progressionGlobale: { height: 3, backgroundColor: theme.card2, marginHorizontal: 24, borderRadius: 2, overflow: 'hidden', marginBottom: 24 },
+  progressionFill: { height: '100%', backgroundColor: theme.accent, borderRadius: 2 },
   reposContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
-  reposLabel: { color: '#E63946', fontSize: 12, fontWeight: 'bold', letterSpacing: 4, marginBottom: 16 },
-  reposTemps: { color: '#fff', fontSize: 96, fontWeight: 'bold' },
-  reposSous: { color: '#666', fontSize: 18, marginBottom: 32 },
-  prochainExo: { color: '#aaa', fontSize: 14, marginBottom: 32, textAlign: 'center' },
-  skipBtn: { borderWidth: 1, borderColor: '#333', borderRadius: 12, paddingHorizontal: 24, paddingVertical: 12 },
-  skipBtnText: { color: '#666', fontSize: 14 },
+  reposLabel: { color: theme.accent, fontSize: 12, fontWeight: 'bold', letterSpacing: 4, marginBottom: 16 },
+  reposTemps: { color: theme.texte, fontSize: 96, fontWeight: 'bold' },
+  reposSous: { color: theme.texteFaible, fontSize: 18, marginBottom: 32 },
+  prochainExo: { color: theme.texteSous, fontSize: 14, marginBottom: 32, textAlign: 'center' },
+  skipBtn: { borderWidth: 1, borderColor: theme.bordure, borderRadius: 12, paddingHorizontal: 24, paddingVertical: 12 },
+  skipBtnText: { color: theme.texteFaible, fontSize: 14 },
   exerciceContainer: { flex: 1, paddingHorizontal: 24 },
-  exerciceCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#1a1a1a',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 12,
-    gap: 14,
-  },
-  exerciceNumero: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#E63946', alignItems: 'center', justifyContent: 'center' },
+  exerciceCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: theme.card, borderRadius: 16, padding: 16, marginBottom: 12, gap: 14 },
+  exerciceNumero: { width: 40, height: 40, borderRadius: 20, backgroundColor: theme.accent, alignItems: 'center', justifyContent: 'center' },
   exerciceNumeroText: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
   exerciceInfo: { flex: 1 },
-  exerciceNom: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
-  exerciceMuscle: { color: '#E63946', fontSize: 12, marginTop: 2 },
-  serieBadge: { backgroundColor: '#2a2a2a', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6 },
-  serieBadgeText: { color: '#fff', fontSize: 14, fontWeight: 'bold' },
-  consigneCard: { backgroundColor: '#1a1a1a', borderRadius: 14, padding: 16, marginBottom: 12 },
-  consigneLabel: { color: '#555', fontSize: 11, fontWeight: 'bold', letterSpacing: 2, marginBottom: 8 },
-  consigneText: { color: '#aaa', fontSize: 14, lineHeight: 22 },
-  repsCard: { backgroundColor: '#1a1a1a', borderRadius: 14, padding: 20, marginBottom: 16, alignItems: 'center' },
-  repsLabel: { color: '#555', fontSize: 11, fontWeight: 'bold', letterSpacing: 2, marginBottom: 12 },
-  repsVal: { color: '#E63946', fontSize: 64, fontWeight: 'bold', marginBottom: 20 },
-  validerBtn: { backgroundColor: '#E63946', borderRadius: 14, paddingHorizontal: 32, paddingVertical: 16, width: '100%', alignItems: 'center' },
+  exerciceNom: { color: theme.texte, fontSize: 18, fontWeight: 'bold' },
+  exerciceMuscle: { color: theme.accent, fontSize: 12, marginTop: 2 },
+  serieBadge: { backgroundColor: theme.card2, borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6 },
+  serieBadgeText: { color: theme.texte, fontSize: 14, fontWeight: 'bold' },
+  consigneCard: { backgroundColor: theme.card, borderRadius: 14, padding: 16, marginBottom: 12 },
+  consigneLabel: { color: theme.texteFaible, fontSize: 11, fontWeight: 'bold', letterSpacing: 2, marginBottom: 8 },
+  consigneText: { color: theme.texteSous, fontSize: 14, lineHeight: 22 },
+  repsCard: { backgroundColor: theme.card, borderRadius: 14, padding: 20, marginBottom: 16, alignItems: 'center' },
+  repsLabel: { color: theme.texteFaible, fontSize: 11, fontWeight: 'bold', letterSpacing: 2, marginBottom: 12 },
+  repsVal: { color: theme.accent, fontSize: 64, fontWeight: 'bold', marginBottom: 20 },
+  validerBtn: { backgroundColor: theme.accent, borderRadius: 14, paddingHorizontal: 32, paddingVertical: 16, width: '100%', alignItems: 'center' },
   validerBtnText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
   demarrerBtn: { backgroundColor: '#4caf50', borderRadius: 14, paddingHorizontal: 32, paddingVertical: 16, width: '100%', alignItems: 'center' },
   demarrerBtnText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
   enCoursText: { color: '#4caf50', fontSize: 16, fontWeight: 'bold' },
   seriesRow: { flexDirection: 'row', gap: 10, marginBottom: 24, justifyContent: 'center' },
-  serieDot: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#1a1a1a', borderWidth: 2, borderColor: '#2a2a2a', alignItems: 'center', justifyContent: 'center' },
-  serieDotValidee: { backgroundColor: '#E63946', borderColor: '#E63946' },
-  serieDotText: { color: '#555', fontSize: 16, fontWeight: 'bold' },
+  serieDot: { width: 44, height: 44, borderRadius: 22, backgroundColor: theme.card, borderWidth: 2, borderColor: theme.card2, alignItems: 'center', justifyContent: 'center' },
+  serieDotValidee: { backgroundColor: theme.accent, borderColor: theme.accent },
+  serieDotText: { color: theme.texteFaible, fontSize: 16, fontWeight: 'bold' },
   serieDotTextValidee: { color: '#fff' },
-  suiteLabel: { color: '#555', fontSize: 11, fontWeight: 'bold', letterSpacing: 2, marginBottom: 12 },
-  suiteItem: { flexDirection: 'row', justifyContent: 'space-between', backgroundColor: '#1a1a1a', borderRadius: 12, padding: 14, marginBottom: 8 },
-  suiteNom: { color: '#aaa', fontSize: 14 },
-  suiteMeta: { color: '#555', fontSize: 13 },
-  termineEmoji: { fontSize: 80, marginBottom: 24 },
-  termineTitre: { color: '#fff', fontSize: 32, fontWeight: 'bold', marginBottom: 8 },
-  termineSous: { color: '#aaa', fontSize: 16, marginBottom: 40 },
+  suiteLabel: { color: theme.texteFaible, fontSize: 11, fontWeight: 'bold', letterSpacing: 2, marginBottom: 12 },
+  suiteItem: { flexDirection: 'row', justifyContent: 'space-between', backgroundColor: theme.card, borderRadius: 12, padding: 14, marginBottom: 8 },
+  suiteNom: { color: theme.texteSous, fontSize: 14 },
+  suiteMeta: { color: theme.texteFaible, fontSize: 13 },
+  termineTitre: { color: theme.texte, fontSize: 32, fontWeight: 'bold', marginBottom: 8 },
+  termineSous: { color: theme.texteSous, fontSize: 16, marginBottom: 40 },
   statsFinales: { flexDirection: 'row', gap: 24, marginBottom: 48 },
   statFinale: { alignItems: 'center' },
-  statFinaleVal: { color: '#E63946', fontSize: 28, fontWeight: 'bold' },
-  statFinaleLabel: { color: '#aaa', fontSize: 13, marginTop: 4 },
-  btnTermine: { backgroundColor: '#E63946', borderRadius: 16, padding: 18, alignItems: 'center', width: '100%' },
+  statFinaleVal: { color: theme.accent, fontSize: 28, fontWeight: 'bold' },
+  statFinaleLabel: { color: theme.texteSous, fontSize: 13, marginTop: 4 },
+  btnTermine: { backgroundColor: theme.accent, borderRadius: 16, padding: 18, alignItems: 'center', width: '100%' },
   btnTermineText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
 });

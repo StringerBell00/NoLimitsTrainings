@@ -4,6 +4,7 @@ import {
   TouchableOpacity, TextInput
 } from 'react-native';
 import { router } from 'expo-router';
+import { useTheme } from './ThemeContext';
 
 const DONNEES = {
   exercices: [
@@ -60,9 +61,10 @@ const TYPE_CONFIG = {
 };
 
 export default function Recherche() {
+  const { theme } = useTheme();
+  const s = createStyles(theme);
   const [query, setQuery] = useState('');
   const [categorie, setCategorie] = useState('tout');
-  const [focus, setFocus] = useState(false);
 
   const tousLesElements = [
     ...DONNEES.exercices,
@@ -85,70 +87,63 @@ export default function Recherche() {
   };
 
   return (
-    <View style={styles.container}>
-
-      {/* Header */}
-      <View style={styles.header}>
+    <View style={s.container}>
+      <View style={s.header}>
         <TouchableOpacity onPress={() => router.back()}>
-          <Text style={styles.retour}>Retour</Text>
+          <Text style={s.retour}>Retour</Text>
         </TouchableOpacity>
-        <Text style={styles.titre}>Recherche</Text>
+        <Text style={s.titre}>Recherche</Text>
         <View style={{ width: 50 }} />
       </View>
 
-      {/* Barre de recherche */}
-      <View style={styles.searchContainer}>
-        <Text style={styles.searchIcon}>🔍</Text>
+      <View style={s.searchContainer}>
+        <Text style={s.searchIcon}>🔍</Text>
         <TextInput
-          style={styles.searchInput}
+          style={s.searchInput}
           placeholder="Exercice, programme, coach..."
-          placeholderTextColor="#444"
+          placeholderTextColor={theme.texteFaible}
           value={query}
           onChangeText={setQuery}
-          onFocus={() => setFocus(true)}
-          onBlur={() => setFocus(false)}
           autoFocus
-          color="#fff"
+          color={theme.texte}
         />
         {query.length > 0 && (
           <TouchableOpacity onPress={() => setQuery('')}>
-            <Text style={styles.clearBtn}>✕</Text>
+            <Text style={s.clearBtn}>✕</Text>
           </TouchableOpacity>
         )}
       </View>
 
-      {/* Recherches recentes */}
       {query.length === 0 && (
-        <View style={styles.recentesSection}>
-          <Text style={styles.recentesLabel}>RECHERCHES RECENTES</Text>
-          <View style={styles.recentesRow}>
+        <View style={s.recentesSection}>
+          <Text style={s.recentesLabel}>RECHERCHES RECENTES</Text>
+          <View style={s.recentesRow}>
             {RECHERCHES_RECENTES.map((r, i) => (
               <TouchableOpacity
                 key={i}
-                style={styles.recenteBadge}
+                style={s.recenteBadge}
                 onPress={() => setQuery(r)}
               >
-                <Text style={styles.recenteText}>{r}</Text>
+                <Text style={s.recenteText}>{r}</Text>
               </TouchableOpacity>
             ))}
           </View>
         </View>
       )}
 
-      {/* Filtres categories */}
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        style={styles.categoriesScroll}
+        style={s.categoriesScroll}
       >
-        <View style={styles.categoriesRow}>
+        <View style={s.categoriesRow}>
           {CATEGORIES.map(c => (
             <TouchableOpacity
               key={c.id}
-              style={[styles.categorieBtn, categorie === c.id && styles.categorieBtnActif]}
+              style={[s.categorieBtn, categorie === c.id && s.categorieBtnActif]}
               onPress={() => setCategorie(c.id)}
             >
-              <Text style={[styles.categorieBtnText, categorie === c.id && styles.categorieBtnTextActif]}>
+              <Text style={[s.categorieBtnText, categorie === c.id && s.categorieBtnTextActif]}>
                 {c.label}
               </Text>
             </TouchableOpacity>
@@ -156,21 +151,18 @@ export default function Recherche() {
         </View>
       </ScrollView>
 
-      {/* Compteur resultats */}
       {query.length > 0 && (
-        <Text style={styles.compteur}>
+        <Text style={s.compteur}>
           {resultats.length} resultat{resultats.length > 1 ? 's' : ''} pour "{query}"
         </Text>
       )}
 
-      {/* Resultats */}
-      <ScrollView style={styles.resultats} showsVerticalScrollIndicator={false}>
+      <ScrollView style={s.resultats} showsVerticalScrollIndicator={false}>
         {query.length === 0 && categorie === 'tout' ? (
           <View>
-            {/* Suggestions par categorie */}
             {Object.entries(DONNEES).map(([key, items]) => (
-              <View key={key} style={styles.categorieSection}>
-                <Text style={styles.categorieSectionLabel}>
+              <View key={key} style={s.categorieSection}>
+                <Text style={s.categorieSectionLabel}>
                   {key === 'exercices' ? 'EXERCICES' :
                    key === 'programmes' ? 'PROGRAMMES' :
                    key === 'coaches' ? 'COACHES' : 'NUTRITION'}
@@ -178,18 +170,18 @@ export default function Recherche() {
                 {items.slice(0, 3).map((el, i) => (
                   <TouchableOpacity
                     key={i}
-                    style={styles.resultCard}
+                    style={s.resultCard}
                     onPress={() => naviguer(el)}
                   >
-                    <View style={[styles.typeDot, { backgroundColor: TYPE_CONFIG[el.type].couleur }]} />
-                    <View style={styles.resultInfo}>
-                      <Text style={styles.resultNom}>{el.nom}</Text>
-                      <Text style={styles.resultSous}>
+                    <View style={[s.typeDot, { backgroundColor: TYPE_CONFIG[el.type].couleur }]} />
+                    <View style={s.resultInfo}>
+                      <Text style={s.resultNom}>{el.nom}</Text>
+                      <Text style={s.resultSous}>
                         {el.muscle || el.niveau || el.specialite || el.calories || ''}
                       </Text>
                     </View>
-                    <View style={[styles.typeBadge, { backgroundColor: TYPE_CONFIG[el.type].couleur + '22' }]}>
-                      <Text style={[styles.typeBadgeText, { color: TYPE_CONFIG[el.type].couleur }]}>
+                    <View style={[s.typeBadge, { backgroundColor: TYPE_CONFIG[el.type].couleur + '22' }]}>
+                      <Text style={[s.typeBadgeText, { color: TYPE_CONFIG[el.type].couleur }]}>
                         {TYPE_CONFIG[el.type].label}
                       </Text>
                     </View>
@@ -201,26 +193,26 @@ export default function Recherche() {
         ) : (
           <View>
             {resultats.length === 0 ? (
-              <View style={styles.vide}>
-                <Text style={styles.videTexte}>Aucun resultat pour "{query}"</Text>
-                <Text style={styles.videConseils}>Essaie avec un autre mot cle</Text>
+              <View style={s.vide}>
+                <Text style={s.videTexte}>Aucun resultat pour "{query}"</Text>
+                <Text style={s.videConseils}>Essaie avec un autre mot cle</Text>
               </View>
             ) : (
               resultats.map((el, i) => (
                 <TouchableOpacity
                   key={i}
-                  style={styles.resultCard}
+                  style={s.resultCard}
                   onPress={() => naviguer(el)}
                 >
-                  <View style={[styles.typeDot, { backgroundColor: TYPE_CONFIG[el.type].couleur }]} />
-                  <View style={styles.resultInfo}>
-                    <Text style={styles.resultNom}>{el.nom}</Text>
-                    <Text style={styles.resultSous}>
+                  <View style={[s.typeDot, { backgroundColor: TYPE_CONFIG[el.type].couleur }]} />
+                  <View style={s.resultInfo}>
+                    <Text style={s.resultNom}>{el.nom}</Text>
+                    <Text style={s.resultSous}>
                       {el.muscle || el.niveau || el.specialite || el.calories || ''}
                     </Text>
                   </View>
-                  <View style={[styles.typeBadge, { backgroundColor: TYPE_CONFIG[el.type].couleur + '22' }]}>
-                    <Text style={[styles.typeBadgeText, { color: TYPE_CONFIG[el.type].couleur }]}>
+                  <View style={[s.typeBadge, { backgroundColor: TYPE_CONFIG[el.type].couleur + '22' }]}>
+                    <Text style={[s.typeBadgeText, { color: TYPE_CONFIG[el.type].couleur }]}>
                       {TYPE_CONFIG[el.type].label}
                     </Text>
                   </View>
@@ -235,65 +227,50 @@ export default function Recherche() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#111' },
+const createStyles = (theme) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: theme.bg },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 24,
-    paddingTop: 60,
-    paddingBottom: 16,
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingHorizontal: 24, paddingTop: 60, paddingBottom: 16,
   },
-  retour: { color: '#E63946', fontSize: 16 },
-  titre: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
+  retour: { color: theme.accent, fontSize: 16 },
+  titre: { color: theme.texte, fontSize: 18, fontWeight: 'bold' },
   searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#1a1a1a',
-    borderRadius: 14,
-    marginHorizontal: 24,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: '#2a2a2a',
-    gap: 10,
+    flexDirection: 'row', alignItems: 'center',
+    backgroundColor: theme.card, borderRadius: 14,
+    marginHorizontal: 24, paddingHorizontal: 16, paddingVertical: 12,
+    marginBottom: 16, borderWidth: 1, borderColor: theme.bordure, gap: 10,
   },
   searchIcon: { fontSize: 16 },
-  searchInput: { flex: 1, fontSize: 16, color: '#fff' },
-  clearBtn: { color: '#555', fontSize: 16 },
+  searchInput: { flex: 1, fontSize: 16 },
+  clearBtn: { color: theme.texteFaible, fontSize: 16 },
   recentesSection: { paddingHorizontal: 24, marginBottom: 16 },
-  recentesLabel: { color: '#555', fontSize: 11, fontWeight: 'bold', letterSpacing: 2, marginBottom: 12 },
+  recentesLabel: { color: theme.texteFaible, fontSize: 11, fontWeight: 'bold', letterSpacing: 2, marginBottom: 12 },
   recentesRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  recenteBadge: { backgroundColor: '#1a1a1a', borderRadius: 20, paddingHorizontal: 14, paddingVertical: 8, borderWidth: 1, borderColor: '#2a2a2a' },
-  recenteText: { color: '#aaa', fontSize: 13 },
+  recenteBadge: { backgroundColor: theme.card, borderRadius: 20, paddingHorizontal: 14, paddingVertical: 8, borderWidth: 1, borderColor: theme.bordure },
+  recenteText: { color: theme.texteSous, fontSize: 13 },
   categoriesScroll: { marginBottom: 12 },
   categoriesRow: { flexDirection: 'row', paddingHorizontal: 24, gap: 8 },
-  categorieBtn: { backgroundColor: '#1a1a1a', borderRadius: 20, paddingHorizontal: 16, paddingVertical: 8, borderWidth: 1, borderColor: '#2a2a2a' },
-  categorieBtnActif: { backgroundColor: '#E63946', borderColor: '#E63946' },
-  categorieBtnText: { color: '#aaa', fontSize: 13, fontWeight: '600' },
+  categorieBtn: { backgroundColor: theme.card, borderRadius: 20, paddingHorizontal: 16, paddingVertical: 8, borderWidth: 1, borderColor: theme.bordure },
+  categorieBtnActif: { backgroundColor: theme.accent, borderColor: theme.accent },
+  categorieBtnText: { color: theme.texteSous, fontSize: 13, fontWeight: '600' },
   categorieBtnTextActif: { color: '#fff' },
-  compteur: { color: '#555', fontSize: 13, paddingHorizontal: 24, marginBottom: 12 },
+  compteur: { color: theme.texteFaible, fontSize: 13, paddingHorizontal: 24, marginBottom: 12 },
   resultats: { flex: 1, paddingHorizontal: 24 },
   categorieSection: { marginBottom: 24 },
-  categorieSectionLabel: { color: '#E63946', fontSize: 11, fontWeight: 'bold', letterSpacing: 3, marginBottom: 12 },
+  categorieSectionLabel: { color: theme.accent, fontSize: 11, fontWeight: 'bold', letterSpacing: 3, marginBottom: 12 },
   resultCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#1a1a1a',
-    borderRadius: 14,
-    padding: 14,
-    marginBottom: 8,
-    gap: 12,
+    flexDirection: 'row', alignItems: 'center',
+    backgroundColor: theme.card, borderRadius: 14,
+    padding: 14, marginBottom: 8, gap: 12,
   },
   typeDot: { width: 10, height: 10, borderRadius: 5 },
   resultInfo: { flex: 1 },
-  resultNom: { color: '#fff', fontSize: 15, fontWeight: '600', marginBottom: 2 },
-  resultSous: { color: '#555', fontSize: 12 },
+  resultNom: { color: theme.texte, fontSize: 15, fontWeight: '600', marginBottom: 2 },
+  resultSous: { color: theme.texteFaible, fontSize: 12 },
   typeBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20 },
   typeBadgeText: { fontSize: 11, fontWeight: 'bold' },
   vide: { alignItems: 'center', paddingTop: 60 },
-  videTexte: { color: '#aaa', fontSize: 16, marginBottom: 8 },
-  videConseils: { color: '#555', fontSize: 13 },
+  videTexte: { color: theme.texteSous, fontSize: 16, marginBottom: 8 },
+  videConseils: { color: theme.texteFaible, fontSize: 13 },
 });
