@@ -22,6 +22,7 @@ export default function RootLayout() {
           <Stack.Screen name="timer" />
           <Stack.Screen name="recherche" />
           <Stack.Screen name="historique" />
+          <Stack.Screen name="defis" />
         </Stack>
       </LangueProvider>
     </AuthProvider>

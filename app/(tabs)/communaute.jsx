@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Image, Alert } from 'react-native';
 import { useLangue } from '../LangueContext';
+import { useRouter } from 'expo-router';
 
 const PUBLICATIONS = [
   {
@@ -94,6 +95,7 @@ const RANG_COULEURS = {
 
 export default function Communaute() {
   const { t } = useLangue();
+  const router = useRouter();
   const [onglet, setOnglet] = useState('fil');
   const [publications, setPublications] = useState(PUBLICATIONS);
   const [nouveauPost, setNouveauPost] = useState('');
@@ -133,8 +135,20 @@ export default function Communaute() {
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.brand}>NLT</Text>
-      <Text style={styles.titre}>Communaute</Text>
-      <Text style={styles.sous}>Partage et progresse ensemble</Text>
+
+      {/* Header avec bouton defis */}
+      <View style={styles.header}>
+        <View>
+          <Text style={styles.titre}>Communaute</Text>
+          <Text style={styles.sous}>Partage et progresse ensemble</Text>
+        </View>
+        <TouchableOpacity
+          style={styles.defisBtn}
+          onPress={() => router.push('/defis')}
+        >
+          <Text style={styles.defisBtnText}>Defis</Text>
+        </TouchableOpacity>
+      </View>
 
       {/* Onglets */}
       <View style={styles.onglets}>
@@ -159,7 +173,6 @@ export default function Communaute() {
       {/* Fil d actualite */}
       {onglet === 'fil' && (
         <View>
-          {/* Bouton publier */}
           <TouchableOpacity
             style={styles.publierBtn}
             onPress={() => setAfficherForm(!afficherForm)}
@@ -170,7 +183,6 @@ export default function Communaute() {
             <Text style={styles.publierPlaceholder}>Partage ta seance ou ton objectif...</Text>
           </TouchableOpacity>
 
-          {/* Formulaire publication */}
           {afficherForm && (
             <View style={styles.formCard}>
               <TextInput
@@ -197,10 +209,8 @@ export default function Communaute() {
             </View>
           )}
 
-          {/* Publications */}
           {publications.map(p => (
             <View key={p.id} style={styles.postCard}>
-              {/* Header post */}
               <View style={styles.postHeader}>
                 <View style={styles.postAvatar}>
                   <Text style={styles.postAvatarText}>{p.avatar}</Text>
@@ -216,15 +226,12 @@ export default function Communaute() {
                 </View>
               </View>
 
-              {/* Contenu */}
               <Text style={styles.postContenu}>{p.contenu}</Text>
 
-              {/* Image si presente */}
               {p.image && (
                 <Image source={{ uri: p.image }} style={styles.postImage} resizeMode="cover" />
               )}
 
-              {/* Stats seance */}
               {p.programme && (
                 <View style={styles.seanceStats}>
                   <View style={styles.seanceStat}>
@@ -244,7 +251,6 @@ export default function Communaute() {
                 </View>
               )}
 
-              {/* Actions */}
               <View style={styles.postActions}>
                 <TouchableOpacity
                   style={styles.actionBtn}
@@ -276,7 +282,6 @@ export default function Communaute() {
         <View>
           <Text style={styles.sectionTitle}>CLASSEMENT DU MOIS</Text>
 
-          {/* Top 3 */}
           <View style={styles.podium}>
             {CLASSEMENT.slice(0, 3).map((u, i) => (
               <View key={i} style={[styles.podiumItem, i === 0 && styles.podiumPremier]}>
@@ -293,7 +298,6 @@ export default function Communaute() {
             ))}
           </View>
 
-          {/* Liste complete */}
           <Text style={styles.sectionTitle}>CLASSEMENT COMPLET</Text>
           {CLASSEMENT.map((u, i) => (
             <View
@@ -319,7 +323,6 @@ export default function Communaute() {
             </View>
           ))}
 
-          {/* Comment gagner des points */}
           <Text style={styles.sectionTitle}>COMMENT GAGNER DES POINTS</Text>
           <View style={styles.pointsCard}>
             {[
@@ -346,21 +349,26 @@ export default function Communaute() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#111', paddingHorizontal: 24 },
   brand: { color: '#E63946', fontSize: 14, fontWeight: 'bold', marginTop: 60, letterSpacing: 4 },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 },
   titre: { color: '#fff', fontSize: 28, fontWeight: 'bold', marginTop: 8 },
-  sous: { color: '#aaa', fontSize: 15, marginTop: 4, marginBottom: 24 },
+  sous: { color: '#aaa', fontSize: 15, marginTop: 4 },
+  defisBtn: {
+    backgroundColor: '#E63946',
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    marginTop: 8,
+  },
+  defisBtnText: { color: '#fff', fontWeight: 'bold', fontSize: 13 },
   onglets: { flexDirection: 'row', marginBottom: 24, borderBottomWidth: 1, borderBottomColor: '#2a2a2a' },
   onglet: { flex: 1, paddingVertical: 14, alignItems: 'center' },
   ongletActif: { borderBottomWidth: 2, borderBottomColor: '#E63946' },
   ongletText: { color: '#555', fontSize: 14, fontWeight: '600' },
   ongletTextActif: { color: '#E63946' },
   publierBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#1a1a1a',
-    borderRadius: 16,
-    padding: 16,
-    gap: 12,
-    marginBottom: 16,
+    flexDirection: 'row', alignItems: 'center',
+    backgroundColor: '#1a1a1a', borderRadius: 16,
+    padding: 16, gap: 12, marginBottom: 16,
   },
   publierAvatar: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#E63946', alignItems: 'center', justifyContent: 'center' },
   publierAvatarText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
@@ -384,11 +392,8 @@ const styles = StyleSheet.create({
   postContenu: { color: '#aaa', fontSize: 14, lineHeight: 22, marginBottom: 12 },
   postImage: { width: '100%', height: 200, borderRadius: 12, marginBottom: 12 },
   seanceStats: {
-    flexDirection: 'row',
-    backgroundColor: '#111',
-    borderRadius: 12,
-    padding: 14,
-    marginBottom: 12,
+    flexDirection: 'row', backgroundColor: '#111',
+    borderRadius: 12, padding: 14, marginBottom: 12,
     justifyContent: 'space-around',
   },
   seanceStat: { alignItems: 'center' },
