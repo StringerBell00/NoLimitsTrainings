@@ -202,6 +202,13 @@ export default function Parametres() {
       {/* A propos */}
       <Text style={s.sectionTitle}>{t.aPropos}</Text>
       <View style={s.card}>
+        <TouchableOpacity
+          style={[s.optionRow, s.optionRowBorder]}
+          onPress={() => router.push('/apropos')}
+        >
+          <Text style={s.optionLabel}>A propos de NLT</Text>
+          <Text style={s.arrow}>→</Text>
+        </TouchableOpacity>
         <View style={[s.optionRow, s.optionRowBorder]}>
           <Text style={s.optionLabel}>{t.version}</Text>
           <Text style={s.optionValeur}>1.0.0</Text>

@@ -27,6 +27,7 @@ function AppStack() {
         <Stack.Screen name="defis" />
         <Stack.Screen name="premium" />
         <Stack.Screen name="boutique" />
+        <Stack.Screen name="apropos" />
       </Stack>
     </>
   );
