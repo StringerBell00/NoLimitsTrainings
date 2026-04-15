@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
+import { useTheme } from '../ThemeContext';
 
 const MUSCLES = [
   { id: 'all', label: 'Tous' },
@@ -53,6 +54,8 @@ const NIVEAUX_COLORS = {
 };
 
 export default function Catalogue() {
+  const { theme } = useTheme();
+  const s = createStyles(theme);
   const [muscleSelectionne, setMuscleSelectionne] = useState('all');
   const [recherche, setRecherche] = useState('');
   const [exerciceOuvert, setExerciceOuvert] = useState(null);
@@ -64,33 +67,32 @@ export default function Catalogue() {
   });
 
   return (
-    <View style={styles.container}>
+    <View style={s.container}>
       <ScrollView>
-        <Text style={styles.brand}>NLT</Text>
-        <Text style={styles.titre}>Catalogue</Text>
-        <Text style={styles.sous}>Bibliotheque d exercices</Text>
+        <Text style={s.brand}>NLT</Text>
+        <Text style={s.titre}>Catalogue</Text>
+        <Text style={s.sous}>Bibliotheque d exercices</Text>
 
-        {/* Recherche */}
-        <View style={styles.searchContainer}>
+        <View style={s.searchContainer}>
           <TextInput
-            style={styles.search}
+            style={s.search}
             placeholder="Rechercher un exercice..."
-            placeholderTextColor="#444"
+            placeholderTextColor={theme.texteFaible}
             value={recherche}
             onChangeText={setRecherche}
+            color={theme.texte}
           />
         </View>
 
-        {/* Filtres muscles */}
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filtresScroll}>
-          <View style={styles.filtres}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={s.filtresScroll}>
+          <View style={s.filtres}>
             {MUSCLES.map(m => (
               <TouchableOpacity
                 key={m.id}
-                style={[styles.filtreBtn, muscleSelectionne === m.id && styles.filtreBtnActif]}
+                style={[s.filtreBtn, muscleSelectionne === m.id && s.filtreBtnActif]}
                 onPress={() => setMuscleSelectionne(m.id)}
               >
-                <Text style={[styles.filtreBtnText, muscleSelectionne === m.id && styles.filtreBtnTextActif]}>
+                <Text style={[s.filtreBtnText, muscleSelectionne === m.id && s.filtreBtnTextActif]}>
                   {m.label}
                 </Text>
               </TouchableOpacity>
@@ -98,37 +100,35 @@ export default function Catalogue() {
           </View>
         </ScrollView>
 
-        {/* Compteur */}
-        <Text style={styles.compteur}>{exercicesFiltres.length} exercices</Text>
+        <Text style={s.compteur}>{exercicesFiltres.length} exercices</Text>
 
-        {/* Liste */}
         {exercicesFiltres.map(ex => (
           <TouchableOpacity
             key={ex.id}
-            style={styles.card}
+            style={s.card}
             onPress={() => setExerciceOuvert(exerciceOuvert === ex.id ? null : ex.id)}
           >
-            <View style={styles.cardHeader}>
-              <View style={styles.cardLeft}>
-                <Text style={styles.exNom}>{ex.nom}</Text>
-                <Text style={styles.exMuscle}>
+            <View style={s.cardHeader}>
+              <View style={s.cardLeft}>
+                <Text style={s.exNom}>{ex.nom}</Text>
+                <Text style={s.exMuscle}>
                   {MUSCLES.find(m => m.id === ex.muscle)?.label}
                 </Text>
               </View>
-              <View style={styles.cardRight}>
-                <View style={[styles.niveauBadge, { backgroundColor: NIVEAUX_COLORS[ex.niveau] + '22' }]}>
-                  <Text style={[styles.niveauText, { color: NIVEAUX_COLORS[ex.niveau] }]}>
+              <View style={s.cardRight}>
+                <View style={[s.niveauBadge, { backgroundColor: NIVEAUX_COLORS[ex.niveau] + '22' }]}>
+                  <Text style={[s.niveauText, { color: NIVEAUX_COLORS[ex.niveau] }]}>
                     {ex.niveau}
                   </Text>
                 </View>
-                <Text style={styles.materiel}>{ex.materiel}</Text>
+                <Text style={s.materiel}>{ex.materiel}</Text>
               </View>
             </View>
 
             {exerciceOuvert === ex.id && (
-              <View style={styles.description}>
-                <View style={styles.separateur} />
-                <Text style={styles.descriptionText}>{ex.description}</Text>
+              <View style={s.description}>
+                <View style={s.separateur} />
+                <Text style={s.descriptionText}>{ex.description}</Text>
               </View>
             )}
           </TouchableOpacity>
@@ -140,52 +140,37 @@ export default function Catalogue() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#111' },
-  brand: { color: '#E63946', fontSize: 14, fontWeight: 'bold', marginTop: 60, letterSpacing: 4, paddingHorizontal: 24 },
-  titre: { color: '#fff', fontSize: 28, fontWeight: 'bold', marginTop: 8, paddingHorizontal: 24 },
-  sous: { color: '#aaa', fontSize: 15, marginTop: 4, marginBottom: 24, paddingHorizontal: 24 },
+const createStyles = (theme) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: theme.bg },
+  brand: { color: theme.accent, fontSize: 14, fontWeight: 'bold', marginTop: 60, letterSpacing: 4, paddingHorizontal: 24 },
+  titre: { color: theme.texte, fontSize: 28, fontWeight: 'bold', marginTop: 8, paddingHorizontal: 24 },
+  sous: { color: theme.texteSous, fontSize: 15, marginTop: 4, marginBottom: 24, paddingHorizontal: 24 },
   searchContainer: { paddingHorizontal: 24, marginBottom: 16 },
   search: {
-    backgroundColor: '#1a1a1a',
-    borderRadius: 12,
-    padding: 14,
-    color: '#fff',
-    fontSize: 15,
-    borderWidth: 1,
-    borderColor: '#2a2a2a',
+    backgroundColor: theme.card, borderRadius: 12,
+    padding: 14, fontSize: 15,
+    borderWidth: 1, borderColor: theme.bordure,
   },
   filtresScroll: { marginBottom: 8 },
   filtres: { flexDirection: 'row', paddingHorizontal: 24, gap: 8, paddingBottom: 16 },
-  filtreBtn: {
-    backgroundColor: '#1a1a1a',
-    borderRadius: 20,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderWidth: 1,
-    borderColor: '#2a2a2a',
-  },
-  filtreBtnActif: { backgroundColor: '#E63946', borderColor: '#E63946' },
-  filtreBtnText: { color: '#aaa', fontSize: 13, fontWeight: '600' },
+  filtreBtn: { backgroundColor: theme.card, borderRadius: 20, paddingHorizontal: 16, paddingVertical: 8, borderWidth: 1, borderColor: theme.bordure },
+  filtreBtnActif: { backgroundColor: theme.accent, borderColor: theme.accent },
+  filtreBtnText: { color: theme.texteSous, fontSize: 13, fontWeight: '600' },
   filtreBtnTextActif: { color: '#fff' },
-  compteur: { color: '#555', fontSize: 13, paddingHorizontal: 24, marginBottom: 16 },
+  compteur: { color: theme.texteFaible, fontSize: 13, paddingHorizontal: 24, marginBottom: 16 },
   card: {
-    backgroundColor: '#1a1a1a',
-    borderRadius: 14,
-    padding: 16,
-    marginHorizontal: 24,
-    marginBottom: 10,
-    borderLeftWidth: 3,
-    borderLeftColor: '#E63946',
+    backgroundColor: theme.card, borderRadius: 14,
+    padding: 16, marginHorizontal: 24, marginBottom: 10,
+    borderLeftWidth: 3, borderLeftColor: theme.accent,
   },
   cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   cardLeft: { flex: 1 },
   cardRight: { alignItems: 'flex-end', gap: 6 },
-  exNom: { color: '#fff', fontSize: 15, fontWeight: 'bold', marginBottom: 4 },
-  exMuscle: { color: '#666', fontSize: 12 },
+  exNom: { color: theme.texte, fontSize: 15, fontWeight: 'bold', marginBottom: 4 },
+  exMuscle: { color: theme.texteFaible, fontSize: 12 },
   niveauBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20 },
   niveauText: { fontSize: 11, fontWeight: 'bold' },
-  materiel: { color: '#555', fontSize: 11 },
-  separateur: { height: 1, backgroundColor: '#2a2a2a', marginVertical: 12 },
-  descriptionText: { color: '#aaa', fontSize: 14, lineHeight: 22 },
+  materiel: { color: theme.texteFaible, fontSize: 11 },
+  separateur: { height: 1, backgroundColor: theme.bordure, marginVertical: 12 },
+  descriptionText: { color: theme.texteSous, fontSize: 14, lineHeight: 22 },
 });

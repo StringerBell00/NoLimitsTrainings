@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Image, Alert } from 'react-native';
 import { useLangue } from '../LangueContext';
 import { useRouter } from 'expo-router';
+import { useTheme } from '../ThemeContext';
 
 const PUBLICATIONS = [
   {
@@ -96,6 +97,9 @@ const RANG_COULEURS = {
 export default function Communaute() {
   const { t } = useLangue();
   const router = useRouter();
+  const { theme } = useTheme();
+  const s = createStyles(theme);
+
   const [onglet, setOnglet] = useState('fil');
   const [publications, setPublications] = useState(PUBLICATIONS);
   const [nouveauPost, setNouveauPost] = useState('');
@@ -133,143 +137,137 @@ export default function Communaute() {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.brand}>NLT</Text>
+    <ScrollView style={s.container}>
+      <Text style={s.brand}>NLT</Text>
 
-      {/* Header avec bouton defis */}
-      <View style={styles.header}>
+      <View style={s.header}>
         <View>
-          <Text style={styles.titre}>Communaute</Text>
-          <Text style={styles.sous}>Partage et progresse ensemble</Text>
+          <Text style={s.titre}>Communaute</Text>
+          <Text style={s.sous}>Partage et progresse ensemble</Text>
         </View>
         <TouchableOpacity
-          style={styles.defisBtn}
+          style={s.defisBtn}
           onPress={() => router.push('/defis')}
         >
-          <Text style={styles.defisBtnText}>Defis</Text>
+          <Text style={s.defisBtnText}>Defis</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Onglets */}
-      <View style={styles.onglets}>
+      <View style={s.onglets}>
         <TouchableOpacity
-          style={[styles.onglet, onglet === 'fil' && styles.ongletActif]}
+          style={[s.onglet, onglet === 'fil' && s.ongletActif]}
           onPress={() => setOnglet('fil')}
         >
-          <Text style={[styles.ongletText, onglet === 'fil' && styles.ongletTextActif]}>
+          <Text style={[s.ongletText, onglet === 'fil' && s.ongletTextActif]}>
             Fil d actualite
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.onglet, onglet === 'classement' && styles.ongletActif]}
+          style={[s.onglet, onglet === 'classement' && s.ongletActif]}
           onPress={() => setOnglet('classement')}
         >
-          <Text style={[styles.ongletText, onglet === 'classement' && styles.ongletTextActif]}>
+          <Text style={[s.ongletText, onglet === 'classement' && s.ongletTextActif]}>
             Classement
           </Text>
         </TouchableOpacity>
       </View>
 
-      {/* Fil d actualite */}
       {onglet === 'fil' && (
         <View>
           <TouchableOpacity
-            style={styles.publierBtn}
+            style={s.publierBtn}
             onPress={() => setAfficherForm(!afficherForm)}
           >
-            <View style={styles.publierAvatar}>
-              <Text style={styles.publierAvatarText}>M</Text>
+            <View style={s.publierAvatar}>
+              <Text style={s.publierAvatarText}>M</Text>
             </View>
-            <Text style={styles.publierPlaceholder}>Partage ta seance ou ton objectif...</Text>
+            <Text style={s.publierPlaceholder}>Partage ta seance ou ton objectif...</Text>
           </TouchableOpacity>
 
           {afficherForm && (
-            <View style={styles.formCard}>
+            <View style={s.formCard}>
               <TextInput
-                style={styles.formInput}
+                style={s.formInput}
                 placeholder="Qu as-tu accompli aujourd hui ?"
-                placeholderTextColor="#444"
+                placeholderTextColor={theme.texteFaible}
                 value={nouveauPost}
                 onChangeText={setNouveauPost}
                 multiline
                 numberOfLines={4}
-                color="#fff"
+                color={theme.texte}
               />
-              <View style={styles.formBtns}>
+              <View style={s.formBtns}>
                 <TouchableOpacity
-                  style={styles.formBtnAnnuler}
+                  style={s.formBtnAnnuler}
                   onPress={() => { setAfficherForm(false); setNouveauPost(''); }}
                 >
-                  <Text style={styles.formBtnAnnulerText}>Annuler</Text>
+                  <Text style={s.formBtnAnnulerText}>Annuler</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.formBtnPublier} onPress={publier}>
-                  <Text style={styles.formBtnPublierText}>Publier</Text>
+                <TouchableOpacity style={s.formBtnPublier} onPress={publier}>
+                  <Text style={s.formBtnPublierText}>Publier</Text>
                 </TouchableOpacity>
               </View>
             </View>
           )}
 
           {publications.map(p => (
-            <View key={p.id} style={styles.postCard}>
-              <View style={styles.postHeader}>
-                <View style={styles.postAvatar}>
-                  <Text style={styles.postAvatarText}>{p.avatar}</Text>
+            <View key={p.id} style={s.postCard}>
+              <View style={s.postHeader}>
+                <View style={s.postAvatar}>
+                  <Text style={s.postAvatarText}>{p.avatar}</Text>
                 </View>
-                <View style={styles.postInfo}>
-                  <Text style={styles.postAuteur}>{p.auteur}</Text>
-                  <Text style={styles.postTemps}>{p.temps}</Text>
+                <View style={s.postInfo}>
+                  <Text style={s.postAuteur}>{p.auteur}</Text>
+                  <Text style={s.postTemps}>{p.temps}</Text>
                 </View>
-                <View style={[styles.typeBadge, { backgroundColor: COULEURS_TYPE[p.type]?.bg }]}>
-                  <Text style={[styles.typeBadgeText, { color: COULEURS_TYPE[p.type]?.text }]}>
+                <View style={[s.typeBadge, { backgroundColor: COULEURS_TYPE[p.type]?.bg }]}>
+                  <Text style={[s.typeBadgeText, { color: COULEURS_TYPE[p.type]?.text }]}>
                     {COULEURS_TYPE[p.type]?.label}
                   </Text>
                 </View>
               </View>
 
-              <Text style={styles.postContenu}>{p.contenu}</Text>
+              <Text style={s.postContenu}>{p.contenu}</Text>
 
               {p.image && (
-                <Image source={{ uri: p.image }} style={styles.postImage} resizeMode="cover" />
+                <Image source={{ uri: p.image }} style={s.postImage} resizeMode="cover" />
               )}
 
               {p.programme && (
-                <View style={styles.seanceStats}>
-                  <View style={styles.seanceStat}>
-                    <Text style={styles.seanceStatVal}>{p.programme}</Text>
-                    <Text style={styles.seanceStatLabel}>Programme</Text>
+                <View style={s.seanceStats}>
+                  <View style={s.seanceStat}>
+                    <Text style={s.seanceStatVal}>{p.programme}</Text>
+                    <Text style={s.seanceStatLabel}>Programme</Text>
                   </View>
-                  <View style={styles.seanceStatDivider} />
-                  <View style={styles.seanceStat}>
-                    <Text style={styles.seanceStatVal}>{p.duree}</Text>
-                    <Text style={styles.seanceStatLabel}>Duree</Text>
+                  <View style={s.seanceStatDivider} />
+                  <View style={s.seanceStat}>
+                    <Text style={s.seanceStatVal}>{p.duree}</Text>
+                    <Text style={s.seanceStatLabel}>Duree</Text>
                   </View>
-                  <View style={styles.seanceStatDivider} />
-                  <View style={styles.seanceStat}>
-                    <Text style={styles.seanceStatVal}>{p.calories} kcal</Text>
-                    <Text style={styles.seanceStatLabel}>Calories</Text>
+                  <View style={s.seanceStatDivider} />
+                  <View style={s.seanceStat}>
+                    <Text style={s.seanceStatVal}>{p.calories} kcal</Text>
+                    <Text style={s.seanceStatLabel}>Calories</Text>
                   </View>
                 </View>
               )}
 
-              <View style={styles.postActions}>
-                <TouchableOpacity
-                  style={styles.actionBtn}
-                  onPress={() => toggleLike(p.id)}
-                >
-                  <Text style={[styles.actionIcon, p.liked && { color: '#E63946' }]}>
+              <View style={s.postActions}>
+                <TouchableOpacity style={s.actionBtn} onPress={() => toggleLike(p.id)}>
+                  <Text style={[s.actionIcon, p.liked && { color: theme.accent }]}>
                     {p.liked ? '♥' : '♡'}
                   </Text>
-                  <Text style={[styles.actionCount, p.liked && { color: '#E63946' }]}>
+                  <Text style={[s.actionCount, p.liked && { color: theme.accent }]}>
                     {p.likes}
                   </Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.actionBtn}>
-                  <Text style={styles.actionIcon}>💬</Text>
-                  <Text style={styles.actionCount}>{p.commentaires}</Text>
+                <TouchableOpacity style={s.actionBtn}>
+                  <Text style={s.actionIcon}>💬</Text>
+                  <Text style={s.actionCount}>{p.commentaires}</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.actionBtn}>
-                  <Text style={styles.actionIcon}>↗</Text>
-                  <Text style={styles.actionCount}>Partager</Text>
+                <TouchableOpacity style={s.actionBtn}>
+                  <Text style={s.actionIcon}>↗</Text>
+                  <Text style={s.actionCount}>Partager</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -277,54 +275,50 @@ export default function Communaute() {
         </View>
       )}
 
-      {/* Classement */}
       {onglet === 'classement' && (
         <View>
-          <Text style={styles.sectionTitle}>CLASSEMENT DU MOIS</Text>
+          <Text style={s.sectionTitle}>CLASSEMENT DU MOIS</Text>
 
-          <View style={styles.podium}>
+          <View style={s.podium}>
             {CLASSEMENT.slice(0, 3).map((u, i) => (
-              <View key={i} style={[styles.podiumItem, i === 0 && styles.podiumPremier]}>
-                <Text style={[styles.podiumRang, { color: RANG_COULEURS[u.rang] }]}>
-                  {u.rang === 1 ? '🥇' : u.rang === 2 ? '🥈' : '🥉'}
+              <View key={i} style={[s.podiumItem, i === 0 && s.podiumPremier]}>
+                <Text style={[s.podiumRang, { color: RANG_COULEURS[u.rang] }]}>
+                  {u.rang === 1 ? '1' : u.rang === 2 ? '2' : '3'}
                 </Text>
-                <View style={[styles.podiumAvatar, { borderColor: RANG_COULEURS[u.rang] }]}>
-                  <Text style={styles.podiumAvatarText}>{u.avatar}</Text>
+                <View style={[s.podiumAvatar, { borderColor: RANG_COULEURS[u.rang] }]}>
+                  <Text style={s.podiumAvatarText}>{u.avatar}</Text>
                 </View>
-                <Text style={styles.podiumNom}>{u.nom.split(' ')[0]}</Text>
-                <Text style={styles.podiumPoints}>{u.points} pts</Text>
-                <Text style={styles.podiumSeances}>{u.seances} seances</Text>
+                <Text style={s.podiumNom}>{u.nom.split(' ')[0]}</Text>
+                <Text style={s.podiumPoints}>{u.points} pts</Text>
+                <Text style={s.podiumSeances}>{u.seances} seances</Text>
               </View>
             ))}
           </View>
 
-          <Text style={styles.sectionTitle}>CLASSEMENT COMPLET</Text>
+          <Text style={s.sectionTitle}>CLASSEMENT COMPLET</Text>
           {CLASSEMENT.map((u, i) => (
             <View
               key={i}
-              style={[
-                styles.classementItem,
-                u.nom === 'Mohamed-Lamine S.' && styles.classementItemMoi,
-              ]}
+              style={[s.classementItem, u.nom === 'Mohamed-Lamine S.' && s.classementItemMoi]}
             >
-              <Text style={[styles.classementRang, { color: RANG_COULEURS[u.rang] || '#555' }]}>
+              <Text style={[s.classementRang, { color: RANG_COULEURS[u.rang] || theme.texteFaible }]}>
                 {u.rang}
               </Text>
-              <View style={styles.classementAvatar}>
-                <Text style={styles.classementAvatarText}>{u.avatar}</Text>
+              <View style={s.classementAvatar}>
+                <Text style={s.classementAvatarText}>{u.avatar}</Text>
               </View>
-              <View style={styles.classementInfo}>
-                <Text style={styles.classementNom}>
+              <View style={s.classementInfo}>
+                <Text style={s.classementNom}>
                   {u.nom} {u.nom === 'Mohamed-Lamine S.' ? '(Moi)' : ''}
                 </Text>
-                <Text style={styles.classementSeances}>{u.seances} seances</Text>
+                <Text style={s.classementSeances}>{u.seances} seances</Text>
               </View>
-              <Text style={styles.classementPoints}>{u.points} pts</Text>
+              <Text style={s.classementPoints}>{u.points} pts</Text>
             </View>
           ))}
 
-          <Text style={styles.sectionTitle}>COMMENT GAGNER DES POINTS</Text>
-          <View style={styles.pointsCard}>
+          <Text style={s.sectionTitle}>COMMENT GAGNER DES POINTS</Text>
+          <View style={s.pointsCard}>
             {[
               { action: 'Seance completee', points: '+100 pts' },
               { action: 'Objectif atteint', points: '+250 pts' },
@@ -332,9 +326,9 @@ export default function Communaute() {
               { action: 'Like recu', points: '+5 pts' },
               { action: 'Seance avec coach', points: '+150 pts' },
             ].map((item, i) => (
-              <View key={i} style={[styles.pointsItem, i < 4 && styles.pointsItemBorder]}>
-                <Text style={styles.pointsAction}>{item.action}</Text>
-                <Text style={styles.pointsVal}>{item.points}</Text>
+              <View key={i} style={[s.pointsItem, i < 4 && s.pointsItemBorder]}>
+                <Text style={s.pointsAction}>{item.action}</Text>
+                <Text style={s.pointsVal}>{item.points}</Text>
               </View>
             ))}
           </View>
@@ -346,86 +340,72 @@ export default function Communaute() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#111', paddingHorizontal: 24 },
-  brand: { color: '#E63946', fontSize: 14, fontWeight: 'bold', marginTop: 60, letterSpacing: 4 },
+const createStyles = (theme) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: theme.bg, paddingHorizontal: 24 },
+  brand: { color: theme.accent, fontSize: 14, fontWeight: 'bold', marginTop: 60, letterSpacing: 4 },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 },
-  titre: { color: '#fff', fontSize: 28, fontWeight: 'bold', marginTop: 8 },
-  sous: { color: '#aaa', fontSize: 15, marginTop: 4 },
-  defisBtn: {
-    backgroundColor: '#E63946',
-    borderRadius: 20,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    marginTop: 8,
-  },
+  titre: { color: theme.texte, fontSize: 28, fontWeight: 'bold', marginTop: 8 },
+  sous: { color: theme.texteSous, fontSize: 15, marginTop: 4 },
+  defisBtn: { backgroundColor: theme.accent, borderRadius: 20, paddingHorizontal: 16, paddingVertical: 8, marginTop: 8 },
   defisBtnText: { color: '#fff', fontWeight: 'bold', fontSize: 13 },
-  onglets: { flexDirection: 'row', marginBottom: 24, borderBottomWidth: 1, borderBottomColor: '#2a2a2a' },
+  onglets: { flexDirection: 'row', marginBottom: 24, borderBottomWidth: 1, borderBottomColor: theme.bordure },
   onglet: { flex: 1, paddingVertical: 14, alignItems: 'center' },
-  ongletActif: { borderBottomWidth: 2, borderBottomColor: '#E63946' },
-  ongletText: { color: '#555', fontSize: 14, fontWeight: '600' },
-  ongletTextActif: { color: '#E63946' },
-  publierBtn: {
-    flexDirection: 'row', alignItems: 'center',
-    backgroundColor: '#1a1a1a', borderRadius: 16,
-    padding: 16, gap: 12, marginBottom: 16,
-  },
-  publierAvatar: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#E63946', alignItems: 'center', justifyContent: 'center' },
+  ongletActif: { borderBottomWidth: 2, borderBottomColor: theme.accent },
+  ongletText: { color: theme.texteFaible, fontSize: 14, fontWeight: '600' },
+  ongletTextActif: { color: theme.accent },
+  publierBtn: { flexDirection: 'row', alignItems: 'center', backgroundColor: theme.card, borderRadius: 16, padding: 16, gap: 12, marginBottom: 16 },
+  publierAvatar: { width: 40, height: 40, borderRadius: 20, backgroundColor: theme.accent, alignItems: 'center', justifyContent: 'center' },
   publierAvatarText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
-  publierPlaceholder: { color: '#444', fontSize: 14 },
-  formCard: { backgroundColor: '#1a1a1a', borderRadius: 16, padding: 16, marginBottom: 16 },
-  formInput: { backgroundColor: '#111', borderRadius: 12, padding: 14, fontSize: 14, minHeight: 100, textAlignVertical: 'top', marginBottom: 12 },
+  publierPlaceholder: { color: theme.texteFaible, fontSize: 14 },
+  formCard: { backgroundColor: theme.card, borderRadius: 16, padding: 16, marginBottom: 16 },
+  formInput: { backgroundColor: theme.bg, borderRadius: 12, padding: 14, fontSize: 14, minHeight: 100, textAlignVertical: 'top', marginBottom: 12 },
   formBtns: { flexDirection: 'row', gap: 12 },
-  formBtnAnnuler: { flex: 1, backgroundColor: '#2a2a2a', borderRadius: 10, padding: 12, alignItems: 'center' },
-  formBtnAnnulerText: { color: '#aaa', fontWeight: 'bold' },
-  formBtnPublier: { flex: 1, backgroundColor: '#E63946', borderRadius: 10, padding: 12, alignItems: 'center' },
+  formBtnAnnuler: { flex: 1, backgroundColor: theme.card2, borderRadius: 10, padding: 12, alignItems: 'center' },
+  formBtnAnnulerText: { color: theme.texteSous, fontWeight: 'bold' },
+  formBtnPublier: { flex: 1, backgroundColor: theme.accent, borderRadius: 10, padding: 12, alignItems: 'center' },
   formBtnPublierText: { color: '#fff', fontWeight: 'bold' },
-  postCard: { backgroundColor: '#1a1a1a', borderRadius: 20, padding: 16, marginBottom: 16 },
+  postCard: { backgroundColor: theme.card, borderRadius: 20, padding: 16, marginBottom: 16 },
   postHeader: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 12 },
-  postAvatar: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#E63946', alignItems: 'center', justifyContent: 'center' },
+  postAvatar: { width: 44, height: 44, borderRadius: 22, backgroundColor: theme.accent, alignItems: 'center', justifyContent: 'center' },
   postAvatarText: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
   postInfo: { flex: 1 },
-  postAuteur: { color: '#fff', fontSize: 15, fontWeight: 'bold' },
-  postTemps: { color: '#555', fontSize: 12, marginTop: 2 },
+  postAuteur: { color: theme.texte, fontSize: 15, fontWeight: 'bold' },
+  postTemps: { color: theme.texteFaible, fontSize: 12, marginTop: 2 },
   typeBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20 },
   typeBadgeText: { fontSize: 11, fontWeight: 'bold' },
-  postContenu: { color: '#aaa', fontSize: 14, lineHeight: 22, marginBottom: 12 },
+  postContenu: { color: theme.texteSous, fontSize: 14, lineHeight: 22, marginBottom: 12 },
   postImage: { width: '100%', height: 200, borderRadius: 12, marginBottom: 12 },
-  seanceStats: {
-    flexDirection: 'row', backgroundColor: '#111',
-    borderRadius: 12, padding: 14, marginBottom: 12,
-    justifyContent: 'space-around',
-  },
+  seanceStats: { flexDirection: 'row', backgroundColor: theme.bg, borderRadius: 12, padding: 14, marginBottom: 12, justifyContent: 'space-around' },
   seanceStat: { alignItems: 'center' },
-  seanceStatVal: { color: '#E63946', fontSize: 13, fontWeight: 'bold' },
-  seanceStatLabel: { color: '#555', fontSize: 11, marginTop: 2 },
-  seanceStatDivider: { width: 1, backgroundColor: '#2a2a2a' },
-  postActions: { flexDirection: 'row', gap: 24, paddingTop: 12, borderTopWidth: 1, borderTopColor: '#2a2a2a' },
+  seanceStatVal: { color: theme.accent, fontSize: 13, fontWeight: 'bold' },
+  seanceStatLabel: { color: theme.texteFaible, fontSize: 11, marginTop: 2 },
+  seanceStatDivider: { width: 1, backgroundColor: theme.bordure },
+  postActions: { flexDirection: 'row', gap: 24, paddingTop: 12, borderTopWidth: 1, borderTopColor: theme.bordure },
   actionBtn: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  actionIcon: { color: '#555', fontSize: 18 },
-  actionCount: { color: '#555', fontSize: 13 },
-  sectionTitle: { color: '#E63946', fontSize: 11, fontWeight: 'bold', letterSpacing: 3, marginBottom: 16, marginTop: 8 },
+  actionIcon: { color: theme.texteFaible, fontSize: 18 },
+  actionCount: { color: theme.texteFaible, fontSize: 13 },
+  sectionTitle: { color: theme.accent, fontSize: 11, fontWeight: 'bold', letterSpacing: 3, marginBottom: 16, marginTop: 8 },
   podium: { flexDirection: 'row', justifyContent: 'center', gap: 12, marginBottom: 24, alignItems: 'flex-end' },
   podiumItem: { alignItems: 'center', flex: 1 },
   podiumPremier: { marginBottom: 16 },
-  podiumRang: { fontSize: 28, marginBottom: 8 },
-  podiumAvatar: { width: 56, height: 56, borderRadius: 28, backgroundColor: '#1a1a1a', alignItems: 'center', justifyContent: 'center', borderWidth: 2, marginBottom: 8 },
-  podiumAvatarText: { color: '#fff', fontSize: 22, fontWeight: 'bold' },
-  podiumNom: { color: '#fff', fontSize: 12, fontWeight: 'bold', textAlign: 'center' },
-  podiumPoints: { color: '#E63946', fontSize: 13, fontWeight: 'bold' },
-  podiumSeances: { color: '#555', fontSize: 11 },
-  classementItem: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#1a1a1a', borderRadius: 14, padding: 14, marginBottom: 8, gap: 12 },
-  classementItemMoi: { borderWidth: 1, borderColor: '#E63946' },
+  podiumRang: { fontSize: 28, fontWeight: 'bold', marginBottom: 8 },
+  podiumAvatar: { width: 56, height: 56, borderRadius: 28, backgroundColor: theme.card, alignItems: 'center', justifyContent: 'center', borderWidth: 2, marginBottom: 8 },
+  podiumAvatarText: { color: theme.texte, fontSize: 22, fontWeight: 'bold' },
+  podiumNom: { color: theme.texte, fontSize: 12, fontWeight: 'bold', textAlign: 'center' },
+  podiumPoints: { color: theme.accent, fontSize: 13, fontWeight: 'bold' },
+  podiumSeances: { color: theme.texteFaible, fontSize: 11 },
+  classementItem: { flexDirection: 'row', alignItems: 'center', backgroundColor: theme.card, borderRadius: 14, padding: 14, marginBottom: 8, gap: 12 },
+  classementItemMoi: { borderWidth: 1, borderColor: theme.accent },
   classementRang: { fontSize: 18, fontWeight: 'bold', width: 28, textAlign: 'center' },
-  classementAvatar: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#E63946', alignItems: 'center', justifyContent: 'center' },
+  classementAvatar: { width: 40, height: 40, borderRadius: 20, backgroundColor: theme.accent, alignItems: 'center', justifyContent: 'center' },
   classementAvatarText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
   classementInfo: { flex: 1 },
-  classementNom: { color: '#fff', fontSize: 14, fontWeight: 'bold' },
-  classementSeances: { color: '#555', fontSize: 12, marginTop: 2 },
-  classementPoints: { color: '#E63946', fontSize: 15, fontWeight: 'bold' },
-  pointsCard: { backgroundColor: '#1a1a1a', borderRadius: 16, overflow: 'hidden', marginBottom: 16 },
+  classementNom: { color: theme.texte, fontSize: 14, fontWeight: 'bold' },
+  classementSeances: { color: theme.texteFaible, fontSize: 12, marginTop: 2 },
+  classementPoints: { color: theme.accent, fontSize: 15, fontWeight: 'bold' },
+  pointsCard: { backgroundColor: theme.card, borderRadius: 16, overflow: 'hidden', marginBottom: 16 },
   pointsItem: { flexDirection: 'row', justifyContent: 'space-between', padding: 16 },
-  pointsItemBorder: { borderBottomWidth: 1, borderBottomColor: '#2a2a2a' },
-  pointsAction: { color: '#fff', fontSize: 14 },
-  pointsVal: { color: '#E63946', fontSize: 14, fontWeight: 'bold' },
+  pointsItemBorder: { borderBottomWidth: 1, borderBottomColor: theme.bordure },
+  pointsAction: { color: theme.texte, fontSize: 14 },
+  pointsVal: { color: theme.accent, fontSize: 14, fontWeight: 'bold' },
 });
