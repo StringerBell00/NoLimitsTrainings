@@ -20,6 +20,7 @@ export default function RootLayout() {
           <Stack.Screen name="parametres" />
           <Stack.Screen name="timer" />
           <Stack.Screen name="recherche" />
+          <Stack.Screen name="historique" />
         </Stack>
       </LangueProvider>
     </AuthProvider>

@@ -1,5 +1,6 @@
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useLangue } from '../LangueContext';
+import { useRouter } from 'expo-router';
 
 const HISTORIQUE = [
   { id: 1, date: 'Aujourd hui', programme: 'Full Body', duree: '52 min', exercices: 5, calories: 380, fait: true },
@@ -23,6 +24,7 @@ const MAX_DUREE = 80;
 
 export default function Progression() {
   const { t } = useLangue();
+  const router = useRouter();
 
   const seancesTotal = HISTORIQUE.filter(h => h.fait).length;
   const caloriesTotal = HISTORIQUE.reduce((acc, h) => acc + h.calories, 0);
@@ -35,6 +37,7 @@ export default function Progression() {
       <Text style={styles.titre}>{t.progression}</Text>
       <Text style={styles.sous}>{t.suiviPerformances}</Text>
 
+      {/* Stats globales */}
       <View style={styles.statsGrid}>
         <View style={styles.statCard}>
           <Text style={styles.statVal}>{seancesTotal}</Text>
@@ -54,13 +57,17 @@ export default function Progression() {
         </View>
       </View>
 
+      {/* Activite semaine */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>{t.activiteSemaine}</Text>
         <View style={styles.activiteRow}>
           {ACTIVITE_SEMAINE.map((j, i) => (
             <View key={i} style={styles.activiteCol}>
               <View style={styles.barreContainer}>
-                <View style={[styles.barre, { height: j.fait ? Math.max((j.duree / MAX_DUREE) * 80, 8) : 8, backgroundColor: j.fait ? '#E63946' : '#1a1a1a' }]} />
+                <View style={[styles.barre, {
+                  height: j.fait ? Math.max((j.duree / MAX_DUREE) * 80, 8) : 8,
+                  backgroundColor: j.fait ? '#E63946' : '#1a1a1a',
+                }]} />
               </View>
               <Text style={styles.activiteJour}>{j.jour}</Text>
               {j.fait && <Text style={styles.activiteMin}>{j.duree}m</Text>}
@@ -69,6 +76,7 @@ export default function Progression() {
         </View>
       </View>
 
+      {/* Objectifs */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>{t.objectifs}</Text>
         <View style={styles.objectifCard}>
@@ -100,6 +108,15 @@ export default function Progression() {
         </View>
       </View>
 
+      {/* Bouton calendrier */}
+      <TouchableOpacity
+        style={styles.historiqueBtn}
+        onPress={() => router.push('/historique')}
+      >
+        <Text style={styles.historiqueBtnText}>Voir le calendrier complet</Text>
+      </TouchableOpacity>
+
+      {/* Historique recent */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>{t.historique}</Text>
         {HISTORIQUE.map(h => (
@@ -130,12 +147,20 @@ const styles = StyleSheet.create({
   titre: { color: '#fff', fontSize: 28, fontWeight: 'bold', marginTop: 8 },
   sous: { color: '#aaa', fontSize: 15, marginTop: 4, marginBottom: 24 },
   statsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginBottom: 24 },
-  statCard: { flex: 1, minWidth: '45%', backgroundColor: '#1a1a1a', borderRadius: 16, padding: 16, alignItems: 'center', borderLeftWidth: 3, borderLeftColor: '#E63946' },
+  statCard: {
+    flex: 1, minWidth: '45%', backgroundColor: '#1a1a1a',
+    borderRadius: 16, padding: 16, alignItems: 'center',
+    borderLeftWidth: 3, borderLeftColor: '#E63946',
+  },
   statVal: { color: '#E63946', fontSize: 28, fontWeight: 'bold' },
   statLabel: { color: '#aaa', fontSize: 12, marginTop: 4 },
   section: { marginBottom: 24 },
   sectionTitle: { color: '#E63946', fontSize: 12, fontWeight: 'bold', letterSpacing: 3, marginBottom: 16 },
-  activiteRow: { flexDirection: 'row', justifyContent: 'space-between', backgroundColor: '#1a1a1a', borderRadius: 16, padding: 16, alignItems: 'flex-end' },
+  activiteRow: {
+    flexDirection: 'row', justifyContent: 'space-between',
+    backgroundColor: '#1a1a1a', borderRadius: 16,
+    padding: 16, alignItems: 'flex-end',
+  },
   activiteCol: { alignItems: 'center', flex: 1 },
   barreContainer: { height: 80, justifyContent: 'flex-end', marginBottom: 8 },
   barre: { width: 20, borderRadius: 6 },
@@ -147,8 +172,25 @@ const styles = StyleSheet.create({
   objectifVal: { color: '#E63946', fontSize: 14, fontWeight: 'bold' },
   progressBar: { height: 6, backgroundColor: '#2a2a2a', borderRadius: 3, overflow: 'hidden' },
   progressFill: { height: '100%', backgroundColor: '#E63946', borderRadius: 3 },
-  seanceCard: { backgroundColor: '#1a1a1a', borderRadius: 14, padding: 16, marginBottom: 10, flexDirection: 'row', alignItems: 'center', gap: 14 },
-  checkCircle: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#1a3a1a', alignItems: 'center', justifyContent: 'center' },
+  historiqueBtn: {
+    backgroundColor: '#1a1a1a',
+    borderRadius: 14,
+    padding: 16,
+    alignItems: 'center',
+    marginBottom: 24,
+    borderWidth: 1,
+    borderColor: '#E63946',
+  },
+  historiqueBtnText: { color: '#E63946', fontSize: 15, fontWeight: 'bold' },
+  seanceCard: {
+    backgroundColor: '#1a1a1a', borderRadius: 14,
+    padding: 16, marginBottom: 10,
+    flexDirection: 'row', alignItems: 'center', gap: 14,
+  },
+  checkCircle: {
+    width: 36, height: 36, borderRadius: 18,
+    backgroundColor: '#1a3a1a', alignItems: 'center', justifyContent: 'center',
+  },
   check: { color: '#4caf50', fontSize: 16, fontWeight: 'bold' },
   seanceInfo: { flex: 1 },
   seanceNom: { color: '#fff', fontSize: 15, fontWeight: 'bold', marginBottom: 4 },
