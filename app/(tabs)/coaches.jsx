@@ -104,7 +104,6 @@ export default function Coaches() {
       {coaches.map((c, i) => (
         <View key={i} style={styles.card}>
 
-          {/* Header */}
           <View style={styles.cardHeader}>
             <View style={styles.photoContainer}>
               <Image source={{ uri: c.photo }} style={styles.photo} />
@@ -132,16 +131,13 @@ export default function Coaches() {
             </View>
           </View>
 
-          {/* Tarif */}
           <View style={styles.tarifRow}>
             <Text style={styles.tarifLabel}>Tarif</Text>
             <Text style={styles.tarifVal}>{c.tarif}</Text>
           </View>
 
-          {/* Description */}
           <Text style={styles.description}>{c.description}</Text>
 
-          {/* Certifications */}
           <Text style={styles.detailsTitre}>CERTIFICATIONS</Text>
           <View style={styles.certifsRow}>
             {c.certifications.map((cert, j) => (
@@ -151,17 +147,14 @@ export default function Coaches() {
             ))}
           </View>
 
-          {/* Avis */}
           <Text style={styles.detailsTitre}>AVIS CLIENTS</Text>
 
-          {/* Note globale */}
           <View style={styles.noteGlobale}>
             <Text style={styles.noteGlobaleVal}>{c.note.toFixed(2)}</Text>
             <Text style={styles.noteGlobaleEtoiles}>{noteEnEtoiles(c.note)}</Text>
             <Text style={styles.noteGlobaleAvis}>{c.avis} avis verifies</Text>
           </View>
 
-          {/* Liste avis */}
           {c.avisClients.map((a, j) => (
             <View key={j} style={styles.avisCard}>
               <View style={styles.avisHeader}>
@@ -188,12 +181,19 @@ export default function Coaches() {
             </View>
           ))}
 
-          {/* Bouton reserver */}
+          {/* Boutons action */}
           <TouchableOpacity
             style={styles.btn}
             onPress={() => router.push(`/booking/${c.nom}`)}
           >
             <Text style={styles.btnText}>{t.reserverSeance}</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.chatBtn}
+            onPress={() => router.push(`/chat/${c.nom}`)}
+          >
+            <Text style={styles.chatBtnText}>Envoyer un message</Text>
           </TouchableOpacity>
 
         </View>
@@ -209,34 +209,15 @@ const styles = StyleSheet.create({
   brand: { color: '#E63946', fontSize: 14, fontWeight: 'bold', marginTop: 60, letterSpacing: 4 },
   titre: { color: '#fff', fontSize: 28, fontWeight: 'bold', marginTop: 8 },
   subtitle: { color: '#aaa', fontSize: 15, marginTop: 8, marginBottom: 32 },
-  card: {
-    backgroundColor: '#1a1a1a',
-    borderRadius: 20,
-    padding: 20,
-    marginBottom: 16,
-  },
+  card: { backgroundColor: '#1a1a1a', borderRadius: 20, padding: 20, marginBottom: 16 },
   cardHeader: { flexDirection: 'row', gap: 16, marginBottom: 16 },
   photoContainer: { position: 'relative' },
-  photo: {
-    width: 90,
-    height: 90,
-    borderRadius: 45,
-    backgroundColor: '#2a2a2a',
-    borderWidth: 2,
-    borderColor: '#E63946',
-  },
+  photo: { width: 90, height: 90, borderRadius: 45, backgroundColor: '#2a2a2a', borderWidth: 2, borderColor: '#E63946' },
   photoEditBtn: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-    width: 26,
-    height: 26,
-    borderRadius: 13,
-    backgroundColor: '#E63946',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: '#1a1a1a',
+    position: 'absolute', bottom: 0, right: 0,
+    width: 26, height: 26, borderRadius: 13,
+    backgroundColor: '#E63946', alignItems: 'center', justifyContent: 'center',
+    borderWidth: 2, borderColor: '#1a1a1a',
   },
   photoEditText: { color: '#fff', fontSize: 18, fontWeight: 'bold', lineHeight: 22 },
   info: { flex: 1 },
@@ -248,70 +229,23 @@ const styles = StyleSheet.create({
   etoilesText: { color: '#ff9800', fontSize: 14 },
   noteVal: { color: '#fff', fontSize: 14, fontWeight: 'bold' },
   avisCount: { color: '#555', fontSize: 12 },
-  dispoBadge: {
-    backgroundColor: '#1a3a1a',
-    borderRadius: 20,
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    alignSelf: 'flex-start',
-  },
+  dispoBadge: { backgroundColor: '#1a3a1a', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 4, alignSelf: 'flex-start' },
   dispoText: { color: '#4caf50', fontSize: 11, fontWeight: 'bold' },
-  tarifRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    backgroundColor: '#111',
-    borderRadius: 12,
-    padding: 14,
-    marginBottom: 16,
-  },
+  tarifRow: { flexDirection: 'row', justifyContent: 'space-between', backgroundColor: '#111', borderRadius: 12, padding: 14, marginBottom: 16 },
   tarifLabel: { color: '#aaa', fontSize: 14 },
   tarifVal: { color: '#E63946', fontSize: 16, fontWeight: 'bold' },
   description: { color: '#aaa', fontSize: 14, lineHeight: 22, marginBottom: 16 },
-  detailsTitre: {
-    color: '#E63946',
-    fontSize: 11,
-    fontWeight: 'bold',
-    letterSpacing: 2,
-    marginBottom: 12,
-    marginTop: 4,
-  },
+  detailsTitre: { color: '#E63946', fontSize: 11, fontWeight: 'bold', letterSpacing: 2, marginBottom: 12, marginTop: 4 },
   certifsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 20 },
   certifBadge: { backgroundColor: '#2a2a2a', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6 },
   certifText: { color: '#aaa', fontSize: 12 },
-  noteGlobale: {
-    backgroundColor: '#111',
-    borderRadius: 16,
-    padding: 20,
-    alignItems: 'center',
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: '#E63946',
-  },
+  noteGlobale: { backgroundColor: '#111', borderRadius: 16, padding: 20, alignItems: 'center', marginBottom: 16, borderWidth: 1, borderColor: '#E63946' },
   noteGlobaleVal: { color: '#E63946', fontSize: 48, fontWeight: 'bold' },
   noteGlobaleEtoiles: { color: '#ff9800', fontSize: 20, marginVertical: 4 },
   noteGlobaleAvis: { color: '#555', fontSize: 13 },
-  avisCard: {
-    backgroundColor: '#111',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: '#2a2a2a',
-  },
-  avisHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    marginBottom: 10,
-  },
-  avisAvatar: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    backgroundColor: '#E63946',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  avisCard: { backgroundColor: '#111', borderRadius: 16, padding: 16, marginBottom: 12, borderWidth: 1, borderColor: '#2a2a2a' },
+  avisHeader: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 10 },
+  avisAvatar: { width: 42, height: 42, borderRadius: 21, backgroundColor: '#E63946', alignItems: 'center', justifyContent: 'center' },
   avisAvatarText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
   avisInfoHeader: { flex: 1 },
   avisNom: { color: '#fff', fontSize: 14, fontWeight: 'bold' },
@@ -319,22 +253,11 @@ const styles = StyleSheet.create({
   avisNoteContainer: { alignItems: 'flex-end' },
   avisNoteVal: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
   avisEtoiles: { color: '#ff9800', fontSize: 12 },
-  resultatBadge: {
-    backgroundColor: '#1a3a1a',
-    borderRadius: 20,
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    alignSelf: 'flex-start',
-    marginBottom: 10,
-  },
+  resultatBadge: { backgroundColor: '#1a3a1a', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 4, alignSelf: 'flex-start', marginBottom: 10 },
   resultatText: { color: '#4caf50', fontSize: 12, fontWeight: 'bold' },
   avisCommentaire: { color: '#aaa', fontSize: 13, lineHeight: 20 },
-  btn: {
-    backgroundColor: '#E63946',
-    borderRadius: 14,
-    paddingVertical: 16,
-    alignItems: 'center',
-    marginTop: 20,
-  },
+  btn: { backgroundColor: '#E63946', borderRadius: 14, paddingVertical: 16, alignItems: 'center', marginTop: 20 },
   btnText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
+  chatBtn: { borderWidth: 1, borderColor: '#E63946', borderRadius: 14, paddingVertical: 14, alignItems: 'center', marginTop: 10 },
+  chatBtnText: { color: '#E63946', fontWeight: 'bold', fontSize: 15 },
 });
