@@ -6,18 +6,19 @@ import {
 import { router } from 'expo-router';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import * as Speech from 'expo-speech';
+import { useTheme } from './ThemeContext';
 
 const { width, height } = Dimensions.get('window');
 
 const SONS = [
-  { id: 'gong', label: 'Gong chinois', symbole: '' },
-  { id: 'mecanique', label: 'Sonnerie electromecanique', symbole: '' },
-  { id: 'electronique', label: 'Sonnerie electronique', symbole: '' },
-  { id: 'sifflet_gym', label: 'Sifflet de gym', symbole: '' },
-  { id: 'hockey', label: 'Sonnerie de hockey', symbole: '' },
-  { id: 'arbitre_long', label: 'Long sifflet arbitre', symbole: '' },
-  { id: 'arbitre', label: 'Sifflet arbitre', symbole: '' },
-  { id: 'signal', label: 'Signal sportif', symbole: '' },
+  { id: 'gong', label: 'Gong chinois' },
+  { id: 'mecanique', label: 'Sonnerie electromecanique' },
+  { id: 'electronique', label: 'Sonnerie electronique' },
+  { id: 'sifflet_gym', label: 'Sifflet de gym' },
+  { id: 'hockey', label: 'Sonnerie de hockey' },
+  { id: 'arbitre_long', label: 'Long sifflet arbitre' },
+  { id: 'arbitre', label: 'Sifflet arbitre' },
+  { id: 'signal', label: 'Signal sportif' },
 ];
 
 const COULEURS = [
@@ -42,6 +43,7 @@ const PRESETS = [
 ];
 
 export default function Timer() {
+  const { theme } = useTheme();
   const [ecran, setEcran] = useState('config');
   const [travail, setTravail] = useState(20);
   const [repos, setRepos] = useState(10);
@@ -78,9 +80,7 @@ export default function Timer() {
             passerPhase();
             return 0;
           }
-          if (prev <= 4 && voixActive) {
-            parler(`${prev - 1}`);
-          }
+          if (prev <= 4 && voixActive) parler(`${prev - 1}`);
           return prev - 1;
         });
       }, 1000);
@@ -93,9 +93,8 @@ export default function Timer() {
   const jouerSon = () => {
     if (!voixActive) return;
     const son = SONS.find(s => s.id === sonChoisi);
-    const lang = voix === 'feminin' ? 'fr-FR' : 'fr-FR';
     Speech.speak(son?.label || 'Signal', {
-      language: lang,
+      language: 'fr-FR',
       pitch: voix === 'feminin' ? 1.4 : 0.8,
       rate: 0.9,
     });
@@ -103,11 +102,7 @@ export default function Timer() {
 
   const parler = (texte) => {
     if (!voixActive) return;
-    Speech.speak(texte, {
-      language: 'fr-FR',
-      pitch: voix === 'feminin' ? 1.4 : 0.8,
-      rate: 1.0,
-    });
+    Speech.speak(texte, { language: 'fr-FR', pitch: voix === 'feminin' ? 1.4 : 0.8, rate: 1.0 });
   };
 
   const passerPhase = () => {
@@ -146,7 +141,7 @@ export default function Timer() {
       if (prev >= series) {
         setActif(false);
         setTermine(true);
-        if (voixActive) Speech.speak('Bravo, entrainement termine !', { language: 'fr-FR', pitch: voix === 'feminin' ? 1.4 : 0.8 });
+        if (voixActive) Speech.speak('Bravo ! Seance terminee !', { language: 'fr-FR', pitch: voix === 'feminin' ? 1.4 : 0.8 });
         return prev;
       }
       const next = prev + 1;
@@ -165,14 +160,10 @@ export default function Timer() {
     setActif(true);
     setEcran('actif');
     if (voixActive) Speech.speak('Pret, partez !', { language: 'fr-FR', pitch: voix === 'feminin' ? 1.4 : 0.8 });
-    if (rotation) {
-      await ScreenOrientation.unlockAsync();
-    }
+    if (rotation) await ScreenOrientation.unlockAsync();
   };
 
-  const pauseResume = () => {
-    setActif(prev => !prev);
-  };
+  const pauseResume = () => setActif(prev => !prev);
 
   const reinitialiser = async () => {
     clearInterval(intervalRef.current);
@@ -206,17 +197,14 @@ export default function Timer() {
       <View style={[styles.timerEcran, { backgroundColor: couleurObj.bg }]}>
         <StatusBar hidden />
 
-        {/* Phase */}
         <Text style={[styles.phaseLabel, { color: couleurObj.accent }]}>
           {phase === 'travail' ? 'TRAVAIL' : 'REPOS'}
         </Text>
 
-        {/* Serie */}
         <Text style={[styles.serieLabel, { color: couleurObj.accent + '88' }]}>
           Serie {serieActuelle} / {series}
         </Text>
 
-        {/* Cercle */}
         <View style={[styles.cerclePrincipal, { borderColor: couleurObj.accent + '33' }]}>
           <View style={[styles.cercleInterieur, { borderColor: couleurObj.accent }]}>
             {termine ? (
@@ -229,17 +217,14 @@ export default function Timer() {
           </View>
         </View>
 
-        {/* Barre progression */}
         <View style={styles.progressionBarre}>
           <View style={[styles.progressionFill, { width: `${progression * 100}%`, backgroundColor: couleurObj.accent }]} />
         </View>
 
-        {/* Boutons */}
         <View style={styles.boutonsRow}>
           <TouchableOpacity style={[styles.btnSecondaire, { borderColor: couleurObj.accent }]} onPress={reinitialiser}>
             <Text style={[styles.btnSecondaireText, { color: couleurObj.accent }]}>Reset</Text>
           </TouchableOpacity>
-
           <TouchableOpacity
             style={[styles.btnPrincipal, { backgroundColor: couleurObj.accent }]}
             onPress={pauseResume}
@@ -249,13 +234,11 @@ export default function Timer() {
               {termine ? 'Termine' : actif ? 'Pause' : 'Reprendre'}
             </Text>
           </TouchableOpacity>
-
           <TouchableOpacity style={[styles.btnSecondaire, { borderColor: couleurObj.accent }]} onPress={reinitialiser}>
             <Text style={[styles.btnSecondaireText, { color: couleurObj.accent }]}>Config</Text>
           </TouchableOpacity>
         </View>
 
-        {/* Prochaine phase */}
         {!termine && (
           <Text style={[styles.prochainePhase, { color: couleurObj.accent + '66' }]}>
             {phase === 'travail' ? `Repos : ${repos}s` : `Travail : ${travail}s`} apres
@@ -274,7 +257,6 @@ export default function Timer() {
       <Text style={[styles.brand, { color: couleurObj.accent }]}>NLT</Text>
       <Text style={styles.titre}>Timer</Text>
 
-      {/* Onglets config */}
       <View style={styles.onglets}>
         {['timer', 'son', 'apparence'].map(o => (
           <TouchableOpacity
@@ -289,10 +271,8 @@ export default function Timer() {
         ))}
       </View>
 
-      {/* Onglet Timer */}
       {ongletConfig === 'timer' && (
         <View style={styles.section}>
-          {/* Presets */}
           <Text style={[styles.sectionTitle, { color: couleurObj.accent }]}>PRESETS</Text>
           <View style={styles.presetsRow}>
             {PRESETS.map(p => (
@@ -307,7 +287,6 @@ export default function Timer() {
             ))}
           </View>
 
-          {/* Travail */}
           <Text style={[styles.sectionTitle, { color: couleurObj.accent }]}>TRAVAIL</Text>
           <View style={styles.valeurRow}>
             <TouchableOpacity style={[styles.valeurBtn, { borderColor: couleurObj.accent }]} onPress={() => setTravail(Math.max(5, travail - 5))}>
@@ -319,7 +298,6 @@ export default function Timer() {
             </TouchableOpacity>
           </View>
 
-          {/* Repos */}
           <Text style={[styles.sectionTitle, { color: couleurObj.accent }]}>REPOS</Text>
           <View style={styles.valeurRow}>
             <TouchableOpacity style={[styles.valeurBtn, { borderColor: couleurObj.accent }]} onPress={() => setRepos(Math.max(0, repos - 5))}>
@@ -331,7 +309,6 @@ export default function Timer() {
             </TouchableOpacity>
           </View>
 
-          {/* Series */}
           <Text style={[styles.sectionTitle, { color: couleurObj.accent }]}>SERIES</Text>
           <View style={styles.valeurRow}>
             <TouchableOpacity style={[styles.valeurBtn, { borderColor: couleurObj.accent }]} onPress={() => setSeries(Math.max(1, series - 1))}>
@@ -343,7 +320,6 @@ export default function Timer() {
             </TouchableOpacity>
           </View>
 
-          {/* Rotation */}
           <View style={styles.switchRow}>
             <View>
               <Text style={styles.switchLabel}>Rotation ecran</Text>
@@ -359,7 +335,6 @@ export default function Timer() {
         </View>
       )}
 
-      {/* Onglet Son */}
       {ongletConfig === 'son' && (
         <View style={styles.section}>
           <View style={styles.switchRow}>
@@ -409,7 +384,6 @@ export default function Timer() {
         </View>
       )}
 
-      {/* Onglet Apparence */}
       {ongletConfig === 'apparence' && (
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: couleurObj.accent }]}>COULEUR DU TIMER</Text>
@@ -427,7 +401,6 @@ export default function Timer() {
             </TouchableOpacity>
           ))}
 
-          {/* Apercu */}
           <Text style={[styles.sectionTitle, { color: couleurObj.accent }]}>APERCU</Text>
           <View style={[styles.apercu, { backgroundColor: couleurObj.bg, borderColor: couleurObj.accent + '44' }]}>
             <Text style={[styles.apercuPhase, { color: couleurObj.accent }]}>TRAVAIL</Text>
@@ -439,7 +412,6 @@ export default function Timer() {
         </View>
       )}
 
-      {/* Bouton demarrer */}
       <TouchableOpacity
         style={[styles.demarrerBtn, { backgroundColor: couleurObj.accent }]}
         onPress={demarrer}

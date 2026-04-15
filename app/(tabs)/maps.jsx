@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
+import { useTheme } from '../ThemeContext';
 
 const CATEGORIES = [
   { id: 'all', label: 'Tout' },
@@ -29,6 +30,9 @@ const COLORS = {
 };
 
 export default function Maps() {
+  const { theme } = useTheme();
+  const s = createStyles(theme);
+
   const [location, setLocation] = useState(null);
   const [places, setPlaces] = useState([]);
   const [selected, setSelected] = useState('all');
@@ -54,7 +58,6 @@ export default function Maps() {
       }).catch(async () => {
         return await Location.getLastKnownPositionAsync();
       });
-
       if (loc) {
         setLocation(loc.coords);
       } else {
@@ -94,7 +97,6 @@ export default function Maps() {
         body: query,
       });
       const data = await res.json();
-
       const filtered = data.elements
         .filter(el => el.lat || el.center?.lat)
         .map(el => ({
@@ -106,7 +108,6 @@ export default function Maps() {
         }))
         .filter(el => categoryId === 'all' || el.type === categoryId)
         .slice(0, 40);
-
       setPlaces(filtered);
     } catch (e) {
       setError('Erreur de chargement des lieux');
@@ -139,23 +140,23 @@ export default function Maps() {
   };
 
   if (error) return (
-    <View style={styles.center}>
-      <Text style={styles.errorText}>{error}</Text>
+    <View style={s.center}>
+      <Text style={s.errorText}>{error}</Text>
     </View>
   );
 
   if (!location) return (
-    <View style={styles.center}>
-      <ActivityIndicator color="#E63946" size="large" />
-      <Text style={styles.loadingText}>Localisation en cours...</Text>
+    <View style={s.center}>
+      <ActivityIndicator color={theme.accent} size="large" />
+      <Text style={s.loadingText}>Localisation en cours...</Text>
     </View>
   );
 
   return (
-    <View style={styles.container}>
+    <View style={s.container}>
       <MapView
         ref={mapRef}
-        style={styles.map}
+        style={s.map}
         initialRegion={{
           latitude: location.latitude,
           longitude: location.longitude,
@@ -170,21 +171,21 @@ export default function Maps() {
             key={place.id}
             coordinate={{ latitude: place.lat, longitude: place.lon }}
             title={place.name}
-            pinColor={COLORS[place.type] || '#E63946'}
+            pinColor={COLORS[place.type] || theme.accent}
             onPress={() => setSelectedPlace(place)}
           />
         ))}
       </MapView>
 
-      <View style={styles.filtersContainer}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filters}>
+      <View style={s.filtersContainer}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.filters}>
           {CATEGORIES.map(cat => (
             <TouchableOpacity
               key={cat.id}
-              style={[styles.filterBtn, selected === cat.id && styles.filterBtnActive]}
+              style={[s.filterBtn, selected === cat.id && s.filterBtnActive]}
               onPress={() => setSelected(cat.id)}
             >
-              <Text style={[styles.filterLabel, selected === cat.id && styles.filterLabelActive]}>
+              <Text style={[s.filterLabel, selected === cat.id && s.filterLabelActive]}>
                 {cat.label}
               </Text>
             </TouchableOpacity>
@@ -193,76 +194,74 @@ export default function Maps() {
       </View>
 
       {loading && (
-        <View style={styles.loadingOverlay}>
-          <ActivityIndicator color="#E63946" size="small" />
-          <Text style={styles.loadingText}>  Recherche en cours...</Text>
+        <View style={s.loadingOverlay}>
+          <ActivityIndicator color={theme.accent} size="small" />
+          <Text style={s.loadingText}>  Recherche en cours...</Text>
         </View>
       )}
 
       {selectedPlace && (
-        <View style={styles.placeCard}>
-          <View style={styles.placeInfo}>
-            <Text style={styles.placeName}>{selectedPlace.name}</Text>
-            <Text style={styles.placeType}>
+        <View style={s.placeCard}>
+          <View style={s.placeInfo}>
+            <Text style={s.placeName}>{selectedPlace.name}</Text>
+            <Text style={s.placeType}>
               {CATEGORIES.find(c => c.id === selectedPlace.type)?.label || 'Sport'}
             </Text>
           </View>
-          <TouchableOpacity style={styles.itineraryBtn} onPress={() => openItinerary(selectedPlace)}>
-            <Text style={styles.itineraryText}>Itineraire</Text>
+          <TouchableOpacity style={s.itineraryBtn} onPress={() => openItinerary(selectedPlace)}>
+            <Text style={s.itineraryText}>Itineraire</Text>
           </TouchableOpacity>
         </View>
       )}
 
       {!loading && (
-        <View style={styles.counter}>
-          <Text style={styles.counterText}>{places.length} lieux trouves</Text>
+        <View style={s.counter}>
+          <Text style={s.counterText}>{places.length} lieux trouves</Text>
         </View>
       )}
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#111' },
+const createStyles = (theme) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: theme.bg },
   map: { flex: 1 },
-  center: { flex: 1, backgroundColor: '#111', alignItems: 'center', justifyContent: 'center' },
-  errorText: { color: '#E63946', fontSize: 16, textAlign: 'center', padding: 24 },
-  loadingText: { color: '#aaa', marginTop: 12, fontSize: 14 },
+  center: { flex: 1, backgroundColor: theme.bg, alignItems: 'center', justifyContent: 'center' },
+  errorText: { color: theme.accent, fontSize: 16, textAlign: 'center', padding: 24 },
+  loadingText: { color: theme.texteSous, marginTop: 12, fontSize: 14 },
   filtersContainer: { position: 'absolute', top: 60, left: 0, right: 0 },
   filters: { paddingHorizontal: 16, gap: 8 },
   filterBtn: {
     alignItems: 'center',
-    backgroundColor: 'rgba(17,17,17,0.9)',
+    backgroundColor: theme.id === 'dark' ? 'rgba(17,17,17,0.9)' : 'rgba(255,255,255,0.9)',
     borderRadius: 20,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderWidth: 1,
-    borderColor: '#333',
+    paddingHorizontal: 14, paddingVertical: 8,
+    borderWidth: 1, borderColor: theme.bordure,
   },
-  filterBtnActive: { backgroundColor: '#E63946', borderColor: '#E63946' },
-  filterLabel: { color: '#aaa', fontSize: 12, fontWeight: '600' },
+  filterBtnActive: { backgroundColor: theme.accent, borderColor: theme.accent },
+  filterLabel: { color: theme.texteSous, fontSize: 12, fontWeight: '600' },
   filterLabelActive: { color: '#fff' },
   loadingOverlay: {
     position: 'absolute', bottom: 100, alignSelf: 'center',
-    backgroundColor: 'rgba(17,17,17,0.9)', borderRadius: 20,
+    backgroundColor: theme.card, borderRadius: 20,
     paddingHorizontal: 20, paddingVertical: 10,
     flexDirection: 'row', alignItems: 'center',
   },
   placeCard: {
     position: 'absolute', bottom: 90, left: 16, right: 16,
-    backgroundColor: '#1a1a1a', borderRadius: 16, padding: 16,
+    backgroundColor: theme.card, borderRadius: 16, padding: 16,
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    borderLeftWidth: 4, borderLeftColor: '#E63946',
+    borderLeftWidth: 4, borderLeftColor: theme.accent,
   },
   placeInfo: { flex: 1, marginRight: 12 },
-  placeName: { color: '#fff', fontSize: 15, fontWeight: 'bold', marginBottom: 4 },
-  placeType: { color: '#aaa', fontSize: 13 },
-  itineraryBtn: { backgroundColor: '#E63946', borderRadius: 10, paddingHorizontal: 16, paddingVertical: 10 },
+  placeName: { color: theme.texte, fontSize: 15, fontWeight: 'bold', marginBottom: 4 },
+  placeType: { color: theme.texteSous, fontSize: 13 },
+  itineraryBtn: { backgroundColor: theme.accent, borderRadius: 10, paddingHorizontal: 16, paddingVertical: 10 },
   itineraryText: { color: '#fff', fontWeight: 'bold', fontSize: 13 },
   counter: {
     position: 'absolute', top: 110, alignSelf: 'center',
-    backgroundColor: 'rgba(17,17,17,0.8)', borderRadius: 12,
+    backgroundColor: theme.card, borderRadius: 12,
     paddingHorizontal: 12, paddingVertical: 6,
   },
-  counterText: { color: '#aaa', fontSize: 11 },
+  counterText: { color: theme.texteSous, fontSize: 11 },
 });
