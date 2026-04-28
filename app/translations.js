@@ -1,287 +1,684 @@
-import { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, Alert } from 'react-native';
-import { router } from 'expo-router';
-import { useLangue } from './LangueContext';
-import { TRADUCTIONS } from './translations';
-
-const LANGUES = [
-  { id: 'fr' },
-  { id: 'en' },
-  { id: 'es' },
-  { id: 'pt' },
-  { id: 'de' },
-  { id: 'nl' },
-  { id: 'ar' },
-  { id: 'ja' },
-  { id: 'zh' },
-  { id: 'ko' },
-  { id: 'hi' },
-];
-
-const THEMES = ['sombre', 'clair', 'automatique'];
-
-export default function Parametres() {
-  const { langue, setLangue, t } = useLangue();
-  const [theme, setTheme] = useState('dark');
-  const [notifSeance, setNotifSeance] = useState(true);
-  const [notifNutrition, setNotifNutrition] = useState(false);
-  const [notifCoach, setNotifCoach] = useState(true);
-  const [biometrie, setBiometrie] = useState(false);
-  const [donneesPartagees, setDonneesPartagees] = useState(false);
-
-  const confirmerSuppression = () => {
-    Alert.alert(
-      t.supprimerCompte,
-      'Cette action est irreversible.',
-      [
-        { text: t.annuler, style: 'cancel' },
-        { text: t.supprimerCompte, style: 'destructive', onPress: () => router.replace('/login') },
-      ]
-    );
-  };
-
-  const confirmerDeconnexion = () => {
-    Alert.alert(
-      t.deconnexion,
-      '',
-      [
-        { text: t.annuler, style: 'cancel' },
-        { text: t.seDeconnecter, onPress: () => router.replace('/login') },
-      ]
-    );
-  };
-
-  return (
-    <ScrollView style={styles.container}>
-      <TouchableOpacity style={styles.back} onPress={() => router.back()}>
-        <Text style={styles.backText}>{t.retour}</Text>
-      </TouchableOpacity>
-
-      <Text style={styles.brand}>NLT</Text>
-      <Text style={styles.titre}>{t.parametres}</Text>
-
-      {/* Langue */}
-      <Text style={styles.sectionTitle}>{t.langue}</Text>
-      <View style={styles.card}>
-        {LANGUES.map((l, i) => {
-          const trad = TRADUCTIONS[l.id];
-          return (
-            <TouchableOpacity
-              key={l.id}
-              style={[styles.optionRow, i < LANGUES.length - 1 && styles.optionRowBorder]}
-              onPress={() => setLangue(l.id)}
-            >
-              <View style={styles.langueRow}>
-                <Text style={styles.drapeau}>{trad.drapeau}</Text>
-                <Text style={styles.optionLabel}>{trad.nom}</Text>
-              </View>
-              <View style={[styles.radio, langue === l.id && styles.radioActif]}>
-                {langue === l.id && <View style={styles.radioDot} />}
-              </View>
-            </TouchableOpacity>
-          );
-        })}
-      </View>
-
-      {/* Theme */}
-      <Text style={styles.sectionTitle}>{t.theme}</Text>
-      <View style={styles.card}>
-        {THEMES.map((th, i) => (
-          <TouchableOpacity
-            key={th}
-            style={[styles.optionRow, i < THEMES.length - 1 && styles.optionRowBorder]}
-            onPress={() => setTheme(th)}
-          >
-            <Text style={styles.optionLabel}>{t[th]}</Text>
-            <View style={[styles.radio, theme === th && styles.radioActif]}>
-              {theme === th && <View style={styles.radioDot} />}
-            </View>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      {/* Notifications */}
-      <Text style={styles.sectionTitle}>{t.notifications}</Text>
-      <View style={styles.card}>
-        <View style={[styles.switchRow, styles.optionRowBorder]}>
-          <View style={styles.switchInfo}>
-            <Text style={styles.switchLabel}>Rappels de seances</Text>
-          </View>
-          <Switch
-            value={notifSeance}
-            onValueChange={setNotifSeance}
-            trackColor={{ false: '#2a2a2a', true: '#E63946' }}
-            thumbColor={notifSeance ? '#fff' : '#666'}
-          />
-        </View>
-        <View style={[styles.switchRow, styles.optionRowBorder]}>
-          <View style={styles.switchInfo}>
-            <Text style={styles.switchLabel}>Rappels nutrition</Text>
-          </View>
-          <Switch
-            value={notifNutrition}
-            onValueChange={setNotifNutrition}
-            trackColor={{ false: '#2a2a2a', true: '#E63946' }}
-            thumbColor={notifNutrition ? '#fff' : '#666'}
-          />
-        </View>
-        <View style={styles.switchRow}>
-          <View style={styles.switchInfo}>
-            <Text style={styles.switchLabel}>Messages coach</Text>
-          </View>
-          <Switch
-            value={notifCoach}
-            onValueChange={setNotifCoach}
-            trackColor={{ false: '#2a2a2a', true: '#E63946' }}
-            thumbColor={notifCoach ? '#fff' : '#666'}
-          />
-        </View>
-      </View>
-
-      {/* Securite */}
-      <Text style={styles.sectionTitle}>{t.securite}</Text>
-      <View style={styles.card}>
-        <View style={[styles.switchRow, styles.optionRowBorder]}>
-          <View style={styles.switchInfo}>
-            <Text style={styles.switchLabel}>Face ID / Touch ID</Text>
-          </View>
-          <Switch
-            value={biometrie}
-            onValueChange={setBiometrie}
-            trackColor={{ false: '#2a2a2a', true: '#E63946' }}
-            thumbColor={biometrie ? '#fff' : '#666'}
-          />
-        </View>
-        <TouchableOpacity style={styles.optionRow}>
-          <Text style={styles.optionLabel}>Changer le mot de passe</Text>
-          <Text style={styles.arrow}>→</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Confidentialite */}
-      <Text style={styles.sectionTitle}>{t.confidentialite}</Text>
-      <View style={styles.card}>
-        <View style={[styles.switchRow, styles.optionRowBorder]}>
-          <View style={styles.switchInfo}>
-            <Text style={styles.switchLabel}>Partage de donnees</Text>
-          </View>
-          <Switch
-            value={donneesPartagees}
-            onValueChange={setDonneesPartagees}
-            trackColor={{ false: '#2a2a2a', true: '#E63946' }}
-            thumbColor={donneesPartagees ? '#fff' : '#666'}
-          />
-        </View>
-        <TouchableOpacity style={[styles.optionRow, styles.optionRowBorder]}>
-          <Text style={styles.optionLabel}>Politique de confidentialite</Text>
-          <Text style={styles.arrow}>→</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.optionRow}>
-          <Text style={styles.optionLabel}>Conditions d utilisation</Text>
-          <Text style={styles.arrow}>→</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* A propos */}
-      <Text style={styles.sectionTitle}>{t.aPropos}</Text>
-      <View style={styles.card}>
-        <View style={[styles.optionRow, styles.optionRowBorder]}>
-          <Text style={styles.optionLabel}>{t.version}</Text>
-          <Text style={styles.optionValeur}>1.0.0</Text>
-        </View>
-        <View style={[styles.optionRow, styles.optionRowBorder]}>
-          <Text style={styles.optionLabel}>{t.developpeur}</Text>
-          <Text style={styles.optionValeur}>NLT Team</Text>
-        </View>
-        <TouchableOpacity style={styles.optionRow}>
-          <Text style={styles.optionLabel}>Noter l application</Text>
-          <Text style={styles.arrow}>→</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Compte */}
-      <Text style={styles.sectionTitle}>{t.compte}</Text>
-      <View style={styles.card}>
-        <TouchableOpacity
-          style={[styles.optionRow, styles.optionRowBorder]}
-          onPress={confirmerDeconnexion}
-        >
-          <Text style={[styles.optionLabel, { color: '#E63946' }]}>{t.seDeconnecter}</Text>
-          <Text style={styles.arrow}>→</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.optionRow} onPress={confirmerSuppression}>
-          <Text style={[styles.optionLabel, { color: '#E63946' }]}>{t.supprimerCompte}</Text>
-          <Text style={styles.arrow}>→</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={{ height: 40 }} />
-    </ScrollView>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#111', paddingHorizontal: 24 },
-  back: { marginTop: 60, marginBottom: 8 },
-  backText: { color: '#E63946', fontSize: 16 },
-  brand: { color: '#E63946', fontSize: 12, fontWeight: 'bold', letterSpacing: 4, marginBottom: 8 },
-  titre: { color: '#fff', fontSize: 28, fontWeight: 'bold', marginTop: 4, marginBottom: 24 },
-  sectionTitle: {
-    color: '#E63946',
-    fontSize: 11,
-    fontWeight: 'bold',
-    letterSpacing: 3,
-    marginBottom: 12,
-    marginTop: 8,
+export const TRADUCTIONS = {
+  fr: {
+    drapeau: '🇫🇷',
+    nom: 'Français',
+    aPropos: 'À propos',
+    accesRapides: 'Accès rapides',
+    activiteSemaine: 'Activité de la semaine',
+    age: 'Âge',
+    annuler: 'Annuler',
+    assiduite: 'Assiduité',
+    bonjour: 'Bonjour',
+    calories: 'Calories',
+    carte: 'Carte',
+    ceMois: 'Ce mois',
+    cetteSemaine: 'Cette semaine',
+    clair: 'Clair',
+    commencer: 'Commencer',
+    compte: 'Compte',
+    confidentialite: 'Confidentialité',
+    deconnexion: 'Déconnexion',
+    developpeur: 'Développeur',
+    disponible: 'Disponible',
+    disponibleLabel: 'Disponible',
+    exercices: 'Exercices',
+    expertsAVotreService: 'Des experts à votre service',
+    historique: 'Historique',
+    historiqueSeances: 'Historique des séances',
+    kcalBrulees: 'kcal brûlées',
+    kcalParJour: 'kcal par jour',
+    langue: 'Langue',
+    mesProgrammes: 'Mes programmes',
+    minutes: 'Minutes',
+    modifierProfil: 'Modifier le profil',
+    niveau: 'Niveau',
+    nosCoaches: 'Nos coachs',
+    notifications: 'Notifications',
+    nutrition: 'Nutrition',
+    nutritionDuJour: 'Nutrition du jour',
+    objectif: 'Objectif',
+    objectifs: 'Objectifs',
+    parametres: 'Paramètres',
+    poids: 'Poids',
+    programmeDuJour: 'Programme du jour',
+    progression: 'Progression',
+    reserver: 'Réserver',
+    reserverSeance: 'Réserver une séance',
+    retour: 'Retour',
+    sauvegarder: 'Sauvegarder',
+    seDeconnecter: 'Se déconnecter',
+    seances: 'Séances',
+    seancesCeMois: 'Séances ce mois',
+    securite: 'Sécurité',
+    sombre: 'Sombre',
+    stats: 'Stats',
+    suiviPerformances: 'Suivi de tes performances',
+    supprimerCompte: 'Supprimer le compte',
+    taille: 'Taille',
+    tesCoaches: 'Tes coachs',
+    theme: 'Thème',
+    total: 'Total',
+    version: 'Version',
   },
-  card: {
-    backgroundColor: '#1a1a1a',
-    borderRadius: 16,
-    marginBottom: 16,
-    overflow: 'hidden',
+
+  en: {
+    drapeau: '🇬🇧',
+    nom: 'English',
+    aPropos: 'About',
+    accesRapides: 'Quick access',
+    activiteSemaine: 'Weekly activity',
+    age: 'Age',
+    annuler: 'Cancel',
+    assiduite: 'Attendance',
+    bonjour: 'Hello',
+    calories: 'Calories',
+    carte: 'Map',
+    ceMois: 'This month',
+    cetteSemaine: 'This week',
+    clair: 'Light',
+    commencer: 'Start',
+    compte: 'Account',
+    confidentialite: 'Privacy',
+    deconnexion: 'Sign out',
+    developpeur: 'Developer',
+    disponible: 'Available',
+    disponibleLabel: 'Available',
+    exercices: 'Exercises',
+    expertsAVotreService: 'Experts at your service',
+    historique: 'History',
+    historiqueSeances: 'Session history',
+    kcalBrulees: 'kcal burned',
+    kcalParJour: 'kcal per day',
+    langue: 'Language',
+    mesProgrammes: 'My programs',
+    minutes: 'Minutes',
+    modifierProfil: 'Edit profile',
+    niveau: 'Level',
+    nosCoaches: 'Our coaches',
+    notifications: 'Notifications',
+    nutrition: 'Nutrition',
+    nutritionDuJour: "Today's nutrition",
+    objectif: 'Goal',
+    objectifs: 'Goals',
+    parametres: 'Settings',
+    poids: 'Weight',
+    programmeDuJour: "Today's program",
+    progression: 'Progress',
+    reserver: 'Book',
+    reserverSeance: 'Book a session',
+    retour: 'Back',
+    sauvegarder: 'Save',
+    seDeconnecter: 'Sign out',
+    seances: 'Sessions',
+    seancesCeMois: 'Sessions this month',
+    securite: 'Security',
+    sombre: 'Dark',
+    stats: 'Stats',
+    suiviPerformances: 'Track your performance',
+    supprimerCompte: 'Delete account',
+    taille: 'Height',
+    tesCoaches: 'Your coaches',
+    theme: 'Theme',
+    total: 'Total',
+    version: 'Version',
   },
-  optionRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 16,
+
+  es: {
+    drapeau: '🇪🇸',
+    nom: 'Español',
+    aPropos: 'Acerca de',
+    accesRapides: 'Accesos rápidos',
+    activiteSemaine: 'Actividad semanal',
+    age: 'Edad',
+    annuler: 'Cancelar',
+    assiduite: 'Asistencia',
+    bonjour: 'Hola',
+    calories: 'Calorías',
+    carte: 'Mapa',
+    ceMois: 'Este mes',
+    cetteSemaine: 'Esta semana',
+    clair: 'Claro',
+    commencer: 'Empezar',
+    compte: 'Cuenta',
+    confidentialite: 'Privacidad',
+    deconnexion: 'Cerrar sesión',
+    developpeur: 'Desarrollador',
+    disponible: 'Disponible',
+    disponibleLabel: 'Disponible',
+    exercices: 'Ejercicios',
+    expertsAVotreService: 'Expertos a tu servicio',
+    historique: 'Historial',
+    historiqueSeances: 'Historial de sesiones',
+    kcalBrulees: 'kcal quemadas',
+    kcalParJour: 'kcal por día',
+    langue: 'Idioma',
+    mesProgrammes: 'Mis programas',
+    minutes: 'Minutos',
+    modifierProfil: 'Editar perfil',
+    niveau: 'Nivel',
+    nosCoaches: 'Nuestros entrenadores',
+    notifications: 'Notificaciones',
+    nutrition: 'Nutrición',
+    nutritionDuJour: 'Nutrición de hoy',
+    objectif: 'Objetivo',
+    objectifs: 'Objetivos',
+    parametres: 'Ajustes',
+    poids: 'Peso',
+    programmeDuJour: 'Programa del día',
+    progression: 'Progreso',
+    reserver: 'Reservar',
+    reserverSeance: 'Reservar sesión',
+    retour: 'Volver',
+    sauvegarder: 'Guardar',
+    seDeconnecter: 'Cerrar sesión',
+    seances: 'Sesiones',
+    seancesCeMois: 'Sesiones este mes',
+    securite: 'Seguridad',
+    sombre: 'Oscuro',
+    stats: 'Stats',
+    suiviPerformances: 'Seguimiento de rendimiento',
+    supprimerCompte: 'Eliminar cuenta',
+    taille: 'Altura',
+    tesCoaches: 'Tus entrenadores',
+    theme: 'Tema',
+    total: 'Total',
+    version: 'Versión',
   },
-  optionRowBorder: {
-    borderBottomWidth: 1,
-    borderBottomColor: '#2a2a2a',
+
+  pt: {
+    drapeau: '🇧🇷',
+    nom: 'Português',
+    aPropos: 'Sobre',
+    accesRapides: 'Acessos rápidos',
+    activiteSemaine: 'Atividade semanal',
+    age: 'Idade',
+    annuler: 'Cancelar',
+    assiduite: 'Assiduidade',
+    bonjour: 'Olá',
+    calories: 'Calorias',
+    carte: 'Mapa',
+    ceMois: 'Este mês',
+    cetteSemaine: 'Esta semana',
+    clair: 'Claro',
+    commencer: 'Começar',
+    compte: 'Conta',
+    confidentialite: 'Privacidade',
+    deconnexion: 'Sair',
+    developpeur: 'Desenvolvedor',
+    disponible: 'Disponível',
+    disponibleLabel: 'Disponível',
+    exercices: 'Exercícios',
+    expertsAVotreService: 'Especialistas ao seu serviço',
+    historique: 'Histórico',
+    historiqueSeances: 'Histórico de treinos',
+    kcalBrulees: 'kcal queimadas',
+    kcalParJour: 'kcal por dia',
+    langue: 'Idioma',
+    mesProgrammes: 'Meus programas',
+    minutes: 'Minutos',
+    modifierProfil: 'Editar perfil',
+    nivel: 'Nível',
+    niveau: 'Nível',
+    nosCoaches: 'Nossos treinadores',
+    notifications: 'Notificações',
+    nutrition: 'Nutrição',
+    nutritionDuJour: 'Nutrição de hoje',
+    objectif: 'Objetivo',
+    objectifs: 'Objetivos',
+    parametres: 'Configurações',
+    poids: 'Peso',
+    programmeDuJour: 'Treino do dia',
+    progression: 'Progresso',
+    reserver: 'Reservar',
+    reserverSeance: 'Reservar sessão',
+    retour: 'Voltar',
+    sauvegarder: 'Salvar',
+    seDeconnecter: 'Sair',
+    seances: 'Treinos',
+    seancesCeMois: 'Treinos este mês',
+    securite: 'Segurança',
+    sombre: 'Escuro',
+    stats: 'Stats',
+    suiviPerformances: 'Acompanhamento de desempenho',
+    supprimerCompte: 'Excluir conta',
+    taille: 'Altura',
+    tesCoaches: 'Seus treinadores',
+    theme: 'Tema',
+    total: 'Total',
+    version: 'Versão',
   },
-  langueRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
+
+  de: {
+    drapeau: '🇩🇪',
+    nom: 'Deutsch',
+    aPropos: 'Über uns',
+    accesRapides: 'Schnellzugriff',
+    activiteSemaine: 'Wöchentliche Aktivität',
+    age: 'Alter',
+    annuler: 'Abbrechen',
+    assiduite: 'Treue',
+    bonjour: 'Hallo',
+    calories: 'Kalorien',
+    carte: 'Karte',
+    ceMois: 'Diesen Monat',
+    cetteSemaine: 'Diese Woche',
+    clair: 'Hell',
+    commencer: 'Starten',
+    compte: 'Konto',
+    confidentialite: 'Datenschutz',
+    deconnexion: 'Abmelden',
+    developpeur: 'Entwickler',
+    disponible: 'Verfügbar',
+    disponibleLabel: 'Verfügbar',
+    exercices: 'Übungen',
+    expertsAVotreService: 'Experten zu Ihrem Dienst',
+    historique: 'Verlauf',
+    historiqueSeances: 'Trainingsverlauf',
+    kcalBrulees: 'kcal verbrannt',
+    kcalParJour: 'kcal pro Tag',
+    langue: 'Sprache',
+    mesProgrammes: 'Meine Programme',
+    minutes: 'Minuten',
+    modifierProfil: 'Profil bearbeiten',
+    niveau: 'Niveau',
+    nosCoaches: 'Unsere Trainer',
+    notifications: 'Benachrichtigungen',
+    nutrition: 'Ernährung',
+    nutritionDuJour: 'Heutige Ernährung',
+    objectif: 'Ziel',
+    objectifs: 'Ziele',
+    parametres: 'Einstellungen',
+    poids: 'Gewicht',
+    programmeDuJour: 'Programm des Tages',
+    progression: 'Fortschritt',
+    reserver: 'Buchen',
+    reserverSeance: 'Session buchen',
+    retour: 'Zurück',
+    sauvegarder: 'Speichern',
+    seDeconnecter: 'Abmelden',
+    seances: 'Einheiten',
+    seancesCeMois: 'Einheiten diesen Monat',
+    securite: 'Sicherheit',
+    sombre: 'Dunkel',
+    stats: 'Stats',
+    suiviPerformances: 'Leistungsverfolgung',
+    supprimerCompte: 'Konto löschen',
+    taille: 'Größe',
+    tesCoaches: 'Deine Trainer',
+    theme: 'Design',
+    total: 'Gesamt',
+    version: 'Version',
   },
-  drapeau: { fontSize: 24 },
-  optionLabel: { color: '#fff', fontSize: 15 },
-  optionValeur: { color: '#666', fontSize: 14 },
-  arrow: { color: '#333', fontSize: 16 },
-  radio: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    borderWidth: 2,
-    borderColor: '#444',
-    alignItems: 'center',
-    justifyContent: 'center',
+
+  nl: {
+    drapeau: '🇳🇱',
+    nom: 'Nederlands',
+    aPropos: 'Over ons',
+    accesRapides: 'Snelle toegang',
+    activiteSemaine: 'Weekactiviteit',
+    age: 'Leeftijd',
+    annuler: 'Annuleren',
+    assiduite: 'Aanwezigheid',
+    bonjour: 'Hallo',
+    calories: 'Calorieën',
+    carte: 'Kaart',
+    ceMois: 'Deze maand',
+    cetteSemaine: 'Deze week',
+    clair: 'Licht',
+    commencer: 'Starten',
+    compte: 'Account',
+    confidentialite: 'Privacy',
+    deconnexion: 'Afmelden',
+    developpeur: 'Ontwikkelaar',
+    disponible: 'Beschikbaar',
+    disponibleLabel: 'Beschikbaar',
+    exercices: 'Oefeningen',
+    expertsAVotreService: 'Experts tot uw dienst',
+    historique: 'Geschiedenis',
+    historiqueSeances: 'Sessiegeschiedenis',
+    kcalBrulees: 'kcal verbrand',
+    kcalParJour: 'kcal per dag',
+    langue: 'Taal',
+    mesProgrammes: "Mijn programma's",
+    minutes: 'Minuten',
+    modifierProfil: 'Profiel bewerken',
+    niveau: 'Niveau',
+    nosCoaches: 'Onze coaches',
+    notifications: 'Meldingen',
+    nutrition: 'Voeding',
+    nutritionDuJour: 'Voeding van vandaag',
+    objectif: 'Doel',
+    objectifs: 'Doelen',
+    parametres: 'Instellingen',
+    poids: 'Gewicht',
+    programmeDuJour: 'Programma van de dag',
+    progression: 'Voortgang',
+    reserver: 'Reserveren',
+    reserverSeance: 'Sessie reserveren',
+    retour: 'Terug',
+    sauvegarder: 'Opslaan',
+    seDeconnecter: 'Afmelden',
+    seances: 'Sessies',
+    seancesCeMois: 'Sessies deze maand',
+    securite: 'Beveiliging',
+    sombre: 'Donker',
+    stats: 'Stats',
+    suiviPerformances: 'Prestaties bijhouden',
+    supprimerCompte: 'Account verwijderen',
+    taille: 'Lengte',
+    tesCoaches: 'Jouw coaches',
+    theme: 'Thema',
+    total: 'Totaal',
+    version: 'Versie',
   },
-  radioActif: { borderColor: '#E63946' },
-  radioDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: '#E63946',
+
+  ar: {
+    drapeau: '🇸🇦',
+    nom: 'العربية',
+    aPropos: 'حول',
+    accesRapides: 'وصول سريع',
+    activiteSemaine: 'نشاط الأسبوع',
+    age: 'العمر',
+    annuler: 'إلغاء',
+    assiduite: 'الانتظام',
+    bonjour: 'مرحبا',
+    calories: 'سعرات حرارية',
+    carte: 'الخريطة',
+    ceMois: 'هذا الشهر',
+    cetteSemaine: 'هذا الأسبوع',
+    clair: 'فاتح',
+    commencer: 'ابدأ',
+    compte: 'الحساب',
+    confidentialite: 'الخصوصية',
+    deconnexion: 'تسجيل الخروج',
+    developpeur: 'المطور',
+    disponible: 'متاح',
+    disponibleLabel: 'متاح',
+    exercices: 'التمارين',
+    expertsAVotreService: 'خبراء في خدمتك',
+    historique: 'السجل',
+    historiqueSeances: 'سجل الجلسات',
+    kcalBrulees: 'سعرة محروقة',
+    kcalParJour: 'سعرة يومياً',
+    langue: 'اللغة',
+    mesProgrammes: 'برامجي',
+    minutes: 'دقائق',
+    modifierProfil: 'تعديل الملف الشخصي',
+    niveau: 'المستوى',
+    nosCoaches: 'مدربونا',
+    notifications: 'الإشعارات',
+    nutrition: 'التغذية',
+    nutritionDuJour: 'تغذية اليوم',
+    objectif: 'الهدف',
+    objectifs: 'الأهداف',
+    parametres: 'الإعدادات',
+    poids: 'الوزن',
+    programmeDuJour: 'برنامج اليوم',
+    progression: 'التقدم',
+    reserver: 'احجز',
+    reserverSeance: 'احجز جلسة',
+    retour: 'رجوع',
+    sauvegarder: 'حفظ',
+    seDeconnecter: 'تسجيل الخروج',
+    seances: 'الجلسات',
+    seancesCeMois: 'جلسات هذا الشهر',
+    securite: 'الأمان',
+    sombre: 'داكن',
+    stats: 'إحصائيات',
+    suiviPerformances: 'متابعة الأداء',
+    supprimerCompte: 'حذف الحساب',
+    taille: 'الطول',
+    tesCoaches: 'مدربوك',
+    theme: 'المظهر',
+    total: 'المجموع',
+    version: 'الإصدار',
   },
-  switchRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 16,
+
+  ja: {
+    drapeau: '🇯🇵',
+    nom: '日本語',
+    aPropos: 'について',
+    accesRapides: 'クイックアクセス',
+    activiteSemaine: '今週の活動',
+    age: '年齢',
+    annuler: 'キャンセル',
+    assiduite: '出席率',
+    bonjour: 'こんにちは',
+    calories: 'カロリー',
+    carte: 'マップ',
+    ceMois: '今月',
+    cetteSemaine: '今週',
+    clair: 'ライト',
+    commencer: '開始',
+    compte: 'アカウント',
+    confidentialite: 'プライバシー',
+    deconnexion: 'サインアウト',
+    developpeur: '開発者',
+    disponible: '利用可能',
+    disponibleLabel: '利用可能',
+    exercices: 'エクササイズ',
+    expertsAVotreService: 'エキスパートがサポート',
+    historique: '履歴',
+    historiqueSeances: 'トレーニング履歴',
+    kcalBrulees: 'kcal消費',
+    kcalParJour: 'kcal/日',
+    langue: '言語',
+    mesProgrammes: 'マイプログラム',
+    minutes: '分',
+    modifierProfil: 'プロフィール編集',
+    niveau: 'レベル',
+    nosCoaches: 'コーチ一覧',
+    notifications: '通知',
+    nutrition: '栄養',
+    nutritionDuJour: '今日の栄養',
+    objectif: '目標',
+    objectifs: '目標',
+    parametres: '設定',
+    poids: '体重',
+    programmeDuJour: '今日のプログラム',
+    progression: '進捗',
+    reserver: '予約',
+    reserverSeance: 'セッション予約',
+    retour: '戻る',
+    sauvegarder: '保存',
+    seDeconnecter: 'サインアウト',
+    seances: 'セッション',
+    seancesCeMois: '今月のセッション',
+    securite: 'セキュリティ',
+    sombre: 'ダーク',
+    stats: '統計',
+    suiviPerformances: 'パフォーマンス追跡',
+    supprimerCompte: 'アカウント削除',
+    taille: '身長',
+    tesCoaches: 'あなたのコーチ',
+    theme: 'テーマ',
+    total: '合計',
+    version: 'バージョン',
   },
-  switchInfo: { flex: 1, marginRight: 12 },
-  switchLabel: { color: '#fff', fontSize: 15, marginBottom: 2 },
-  switchDesc: { color: '#555', fontSize: 12 },
-});
+
+  zh: {
+    drapeau: '🇨🇳',
+    nom: '中文',
+    aPropos: '关于',
+    accesRapides: '快速访问',
+    activiteSemaine: '本周活动',
+    age: '年龄',
+    annuler: '取消',
+    assiduite: '出勤率',
+    bonjour: '你好',
+    calories: '卡路里',
+    carte: '地图',
+    ceMois: '本月',
+    cetteSemaine: '本周',
+    clair: '浅色',
+    commencer: '开始',
+    compte: '账户',
+    confidentialite: '隐私',
+    deconnexion: '退出登录',
+    developpeur: '开发者',
+    disponible: '可用',
+    disponibleLabel: '可用',
+    exercices: '练习',
+    expertsAVotreService: '专家为您服务',
+    historique: '历史',
+    historiqueSeances: '训练历史',
+    kcalBrulees: '卡路里消耗',
+    kcalParJour: '卡路里/天',
+    langue: '语言',
+    mesProgrammes: '我的计划',
+    minutes: '分钟',
+    modifierProfil: '编辑资料',
+    niveau: '级别',
+    nosCoaches: '我们的教练',
+    notifications: '通知',
+    nutrition: '营养',
+    nutritionDuJour: '今日营养',
+    objectif: '目标',
+    objectifs: '目标',
+    parametres: '设置',
+    poids: '体重',
+    programmeDuJour: '今日计划',
+    progression: '进度',
+    reserver: '预约',
+    reserverSeance: '预约课程',
+    retour: '返回',
+    sauvegarder: '保存',
+    seDeconnecter: '退出登录',
+    seances: '课程',
+    seancesCeMois: '本月课程',
+    securite: '安全',
+    sombre: '深色',
+    stats: '统计',
+    suiviPerformances: '性能追踪',
+    supprimerCompte: '删除账户',
+    taille: '身高',
+    tesCoaches: '你的教练',
+    theme: '主题',
+    total: '总计',
+    version: '版本',
+  },
+
+  ko: {
+    drapeau: '🇰🇷',
+    nom: '한국어',
+    aPropos: '소개',
+    accesRapides: '빠른 접근',
+    activiteSemaine: '주간 활동',
+    age: '나이',
+    annuler: '취소',
+    assiduite: '출석률',
+    bonjour: '안녕하세요',
+    calories: '칼로리',
+    carte: '지도',
+    ceMois: '이번 달',
+    cetteSemaine: '이번 주',
+    clair: '라이트',
+    commencer: '시작',
+    compte: '계정',
+    confidentialite: '개인정보',
+    deconnexion: '로그아웃',
+    developpeur: '개발자',
+    disponible: '이용 가능',
+    disponibleLabel: '이용 가능',
+    exercices: '운동',
+    expertsAVotreService: '전문가 서비스',
+    historique: '기록',
+    historiqueSeances: '운동 기록',
+    kcalBrulees: 'kcal 소모',
+    kcalParJour: 'kcal/일',
+    langue: '언어',
+    mesProgrammes: '내 프로그램',
+    minutes: '분',
+    modifierProfil: '프로필 수정',
+    niveau: '레벨',
+    nosCoaches: '코치 목록',
+    notifications: '알림',
+    nutrition: '영양',
+    nutritionDuJour: '오늘의 영양',
+    objectif: '목표',
+    objectifs: '목표',
+    parametres: '설정',
+    poids: '체중',
+    programmeDuJour: '오늘의 프로그램',
+    progression: '진행',
+    reserver: '예약',
+    reserverSeance: '세션 예약',
+    retour: '뒤로',
+    sauvegarder: '저장',
+    seDeconnecter: '로그아웃',
+    seances: '세션',
+    seancesCeMois: '이번 달 세션',
+    securite: '보안',
+    sombre: '다크',
+    stats: '통계',
+    suiviPerformances: '퍼포먼스 추적',
+    supprimerCompte: '계정 삭제',
+    taille: '키',
+    tesCoaches: '내 코치',
+    theme: '테마',
+    total: '합계',
+    version: '버전',
+  },
+
+  hi: {
+    drapeau: '🇮🇳',
+    nom: 'हिन्दी',
+    aPropos: 'के बारे में',
+    accesRapides: 'त्वरित पहुँच',
+    activiteSemaine: 'साप्ताहिक गतिविधि',
+    age: 'आयु',
+    annuler: 'रद्द करें',
+    assiduite: 'उपस्थिति',
+    bonjour: 'नमस्ते',
+    calories: 'कैलोरी',
+    carte: 'नक्शा',
+    ceMois: 'इस महीने',
+    cetteSemaine: 'इस सप्ताह',
+    clair: 'हल्का',
+    commencer: 'शुरू करें',
+    compte: 'खाता',
+    confidentialite: 'गोपनीयता',
+    deconnexion: 'साइन आउट',
+    developpeur: 'डेवलपर',
+    disponible: 'उपलब्ध',
+    disponibleLabel: 'उपलब्ध',
+    exercices: 'व्यायाम',
+    expertsAVotreService: 'विशेषज्ञ आपकी सेवा में',
+    historique: 'इतिहास',
+    historiqueSeances: 'सत्र इतिहास',
+    kcalBrulees: 'kcal जला',
+    kcalParJour: 'kcal प्रतिदिन',
+    langue: 'भाषा',
+    mesProgrammes: 'मेरे कार्यक्रम',
+    minutes: 'मिनट',
+    modifierProfil: 'प्रोफ़ाइल संपादित करें',
+    niveau: 'स्तर',
+    nosCoaches: 'हमारे कोच',
+    notifications: 'सूचनाएं',
+    nutrition: 'पोषण',
+    nutritionDuJour: 'आज का पोषण',
+    objectif: 'लक्ष्य',
+    objectifs: 'लक्ष्य',
+    parametres: 'सेटिंग्स',
+    poids: 'वजन',
+    programmeDuJour: 'आज का कार्यक्रम',
+    progression: 'प्रगति',
+    reserver: 'बुक करें',
+    reserverSeance: 'सत्र बुक करें',
+    retour: 'वापस',
+    sauvegarder: 'सहेजें',
+    seDeconnecter: 'साइन आउट',
+    seances: 'सत्र',
+    seancesCeMois: 'इस महीने के सत्र',
+    securite: 'सुरक्षा',
+    sombre: 'डार्क',
+    stats: 'आँकड़े',
+    suiviPerformances: 'प्रदर्शन ट्रैकिंग',
+    supprimerCompte: 'खाता हटाएं',
+    taille: 'कद',
+    tesCoaches: 'आपके कोच',
+    theme: 'थीम',
+    total: 'कुल',
+    version: 'संस्करण',
+  },
+};
