@@ -4,6 +4,7 @@ import {
   TouchableOpacity, TextInput, Alert, Image
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useAuth } from '../AuthContext';
 import { useLangue } from '../LangueContext';
 import { useTheme } from '../ThemeContext';
 import * as ImagePicker from 'expo-image-picker';
@@ -24,31 +25,36 @@ const NIVEAUX = [
 
 export default function Profile() {
   const router = useRouter();
+  const { user, deconnexion, mettreAJourProfil } = useAuth();
   const { t } = useLangue();
   const { theme } = useTheme();
   const s = createStyles(theme);
 
   const [mode, setMode] = useState('view');
-  const [nom, setNom] = useState('Sidib');
-  const [email, setEmail] = useState('mohamedsidibenoisy7@gmail.com');
-  const [poids, setPoids] = useState('75');
-  const [taille, setTaille] = useState('178');
-  const [age, setAge] = useState('25');
-  const [objectif, setObjectif] = useState('prise_masse');
-  const [niveau, setNiveau] = useState('intermediaire');
-  const [photo, setPhoto] = useState(null);
+  const [nom, setNom] = useState(user?.nom || '');
+  const [email, setEmail] = useState(user?.email || '');
+  const [poids, setPoids] = useState(user?.poids || '');
+  const [taille, setTaille] = useState(user?.taille || '');
+  const [age, setAge] = useState(user?.age || '');
+  const [objectif, setObjectif] = useState(user?.objectif || 'prise_masse');
+  const [niveau, setNiveau] = useState(user?.niveau || 'intermediaire');
+  const [photo, setPhoto] = useState(user?.photo || null);
 
-  const sauvegarder = () => {
+  const sauvegarder = async () => {
+    await mettreAJourProfil({ nom, email, poids, taille, age, objectif, niveau, photo });
     setMode('view');
     Alert.alert(t.modifierProfil, t.sauvegarder);
   };
 
-  const handleMenu = (item) => {
+  const handleMenu = async (item) => {
     if (item === t.notifications) router.push('/notifications');
     if (item === t.parametres) router.push('/parametres');
     if (item === 'NLT Premium') router.push('/premium');
     if (item === 'Boutique') router.push('/boutique');
-    if (item === t.deconnexion) router.replace('/login');
+    if (item === t.deconnexion) {
+      await deconnexion();
+      router.replace('/login');
+    }
   };
 
   const afficherOptionsPhoto = () => {

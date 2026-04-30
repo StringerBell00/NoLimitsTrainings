@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, Alert } from 'react-native';
 import { router } from 'expo-router';
+import { useAuth } from './AuthContext';
 import { useLangue } from './LangueContext';
 import { useTheme } from './ThemeContext';
 import { TRADUCTIONS } from './translations';
@@ -20,6 +21,7 @@ const LANGUES = [
 ];
 
 export default function Parametres() {
+  const { deconnexion } = useAuth();
   const { langue, setLangue, t } = useLangue();
   const { theme, themeId, setThemeId } = useTheme();
   const [notifSeance, setNotifSeance] = useState(true);
@@ -34,7 +36,14 @@ export default function Parametres() {
       'Cette action est irreversible.',
       [
         { text: t.annuler, style: 'cancel' },
-        { text: t.supprimerCompte, style: 'destructive', onPress: () => router.replace('/login') },
+        {
+          text: t.supprimerCompte,
+          style: 'destructive',
+          onPress: async () => {
+            await deconnexion();
+            router.replace('/login');
+          },
+        },
       ]
     );
   };
@@ -45,7 +54,13 @@ export default function Parametres() {
       '',
       [
         { text: t.annuler, style: 'cancel' },
-        { text: t.seDeconnecter, onPress: () => router.replace('/login') },
+        {
+          text: t.seDeconnecter,
+          onPress: async () => {
+            await deconnexion();
+            router.replace('/login');
+          },
+        },
       ]
     );
   };
